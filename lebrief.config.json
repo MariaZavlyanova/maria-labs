@@ -1,0 +1,11 @@
+{
+  "site": "lebrief",
+  "feed": "editions.json",
+  "schema": "lebrief-feed-v1",
+  "categories": [
+    "fintech",
+    "cyber"
+  ],
+  "write_policy": "append-or-upsert-by-id; preserve other category and prior editions",
+  "status": "requires GitHub repository + Pages + connected app"
+}
