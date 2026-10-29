@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101922">
+<meta name="description" content="Le Brief — ta bibliothèque de veille Fintech et IAM & Cybersécurité, avec quiz et suivi de lecture.">
+<title>Le Brief — Fintech & Cyber</title>
+<style>
+:root{--bg:#f7f8f6;--paper:#ffffff;--ink:#14242b;--text:#344550;--muted:#75838b;--line:#e6ebe8;--sidebar:#111e26;--green:#1a9073;--greenDark:#126b55;--mint:#e7f6ee;--mintDeep:#d1eee0;--purple:#765dc3;--lav:#f0eafa;--lavDeep:#e3d7fa;--radius:18px;--shadow:0 8px 28px rgba(23,43,47,.045)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.5}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #9ddcca;outline-offset:3px}svg{flex:none}::selection{background:#d3f4e3}
+.layout{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh}.sidebar{position:sticky;top:0;height:100vh;background:var(--sidebar);color:#e6eef0;padding:28px 18px;display:flex;flex-direction:column;z-index:10}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;padding:3px 12px;margin-bottom:45px}.brand-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#bdf2d9;color:#112b29;font-weight:900;font-size:22px;letter-spacing:-2px;transform:rotate(-7deg)}.brand-text{font-family:Manrope,system-ui;font-weight:800;font-size:21px;letter-spacing:-1.25px}.brand-text span{color:#a1e7d2}.nav-label{font-size:10px;color:#84979e;font-weight:800;letter-spacing:2px;padding:0 16px;margin:0 0 12px}.nav-group{display:grid;gap:6px}.nav-link{width:100%;display:flex;align-items:center;gap:13px;min-height:44px;color:#b5c4c8;text-decoration:none;border-radius:11px;padding:0 13px;font-weight:600;font-size:13px;transition:.2s}.nav-link:hover,.nav-link.active{background:#263b42;color:#fff}.nav-link.active:before{content:"";width:3px;height:17px;background:#a4eed0;border-radius:3px;position:absolute;left:18px}.nav-link svg{width:18px;height:18px}.nav-link .count{margin-left:auto;font-size:11px;color:#a5b8bd;font-weight:600}.nav-sep{height:1px;background:#293940;margin:22px 12px 24px}.side-bottom{margin-top:auto}.schedule-note{background:#1d3036;border:1px solid #30474d;border-radius:15px;padding:18px 16px;margin:0 6px 15px}.schedule-note .eyebrow{color:#9cbbc3;font-size:10px;letter-spacing:1.3px;font-weight:800}.schedule-note h4{font-size:14px;margin:8px 0 3px}.schedule-note p{font-size:12px;color:#b6c5c7;margin:0;line-height:1.55}.side-foot{font-size:11px;color:#83979d;padding:5px 15px}
+.workspace{min-width:0}.topbar{height:82px;display:flex;justify-content:space-between;align-items:center;padding:0 max(32px,calc((100vw - 252px - 1130px)/2));border-bottom:1px solid var(--line);background:rgba(250,251,249,.89);position:sticky;top:0;z-index:8;backdrop-filter:blur(18px)}.top-kicker{font-size:11px;font-weight:800;color:#85918f;letter-spacing:1.45px;text-transform:uppercase}.top-date{font-size:14px;font-weight:700;letter-spacing:-.2px;margin-top:3px}.top-actions{display:flex;align-items:center;gap:10px}.search{position:relative;display:flex;align-items:center}.search svg{position:absolute;left:13px;color:#82928c}.search input{background:#fff;border:1px solid #e0e8e4;border-radius:11px;min-height:39px;width:220px;padding:0 12px 0 39px;outline:none;font-size:13px;color:var(--ink)}.search input:focus{border-color:#93cab5}.icon-button{display:grid;place-items:center;width:39px;height:39px;background:white;border:1px solid #e0e8e4;border-radius:11px;color:#405b5c}.icon-button svg{width:18px;height:18px}.main{max-width:1185px;margin:0 auto;padding:38px 32px 95px}.eyebrow{font-size:11px;letter-spacing:1.8px;font-weight:800;text-transform:uppercase;color:#328b75}.hero{display:grid;grid-template-columns:1.55fr .95fr;gap:26px;min-height:260px;align-items:stretch}.hero-intro{padding:25px 0}.hero-intro h1{font-family:Manrope,system-ui;font-weight:800;letter-spacing:-2.25px;line-height:1.14;font-size:clamp(32px,3.45vw,49px);margin:18px 0}.hero-intro h1 em{font-style:normal;color:var(--green)}.hero-intro p{color:#6f7d82;max-width:555px;line-height:1.75;margin:0;font-size:15px}.hero-art{position:relative;overflow:hidden;background:#dcf1e6;border:1px solid #d2eadd;border-radius:24px;display:flex;align-items:flex-end;padding:24px;min-height:260px}.hero-art::before,.hero-art::after{content:"";position:absolute;border-radius:50%}.hero-art::before{width:310px;height:310px;border:43px solid #bce5d0;right:-40px;top:-125px}.hero-art::after{width:220px;height:220px;border:2px solid #94cfb6;right:80px;top:-25px}.art-card{position:relative;z-index:1;background:#f7fff9;border:1px solid #c4e7d5;box-shadow:0 10px 30px #7baa951b;border-radius:16px;padding:18px;width:100%;transform:rotate(-3deg)}.art-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:800}.art-top span{color:#6a8d81}.art-line{height:8px;border-radius:4px;background:#d5eee0;margin-top:15px;width:80%}.art-line:nth-child(3){width:56%;margin-top:8px}.art-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:20px;border-top:1px solid #e3f1e8;padding-top:12px;font-size:12px;color:#507968}.art-check{width:25px;height:25px;border-radius:50%;background:#2da27e;display:grid;place-items:center;color:white}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-top:24px}.stat{background:var(--paper);border:1px solid #e7ece8;border-radius:16px;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow)}.stat strong{display:block;font-family:Manrope;font-size:29px;font-weight:800;letter-spacing:-1px;line-height:1.15}.stat span{font-size:12px;color:var(--muted);font-weight:600}.stat-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;background:#eff7f2;color:#2c9076}.stat:nth-child(2) .stat-icon{background:#f0edfc;color:var(--purple)}.stat:nth-child(3) .stat-icon{background:#fff1e4;color:#bc8150}.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin:40px 0 17px}.section-head h2{font:800 22px Manrope,system-ui;letter-spacing:-.7px;margin:0}.section-head p{font-size:13px;color:#879592;margin:4px 0 0}.text-button{border:0;background:transparent;color:#338f75;font-weight:800;font-size:12px;padding:7px;text-decoration:none}.featured{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.feature-card{border-radius:20px;min-height:283px;border:1px solid #d6e9df;background:#e5f4ec;padding:25px 27px;position:relative;overflow:hidden;display:flex;flex-direction:column;transition:transform .15s}.feature-card.cyber{background:#eee9f9;border-color:#e2d9f1}.feature-card:hover,.issue-card:hover{transform:translateY(-3px)}.feature-card:after{content:"";position:absolute;width:200px;height:200px;border:34px solid rgba(39,148,107,.095);border-radius:50%;right:-110px;top:-90px}.feature-card.cyber:after{border-color:rgba(110,69,178,.09)}.card-top{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}.pill{display:inline-flex;gap:7px;align-items:center;font-size:10px;letter-spacing:.9px;font-weight:800;text-transform:uppercase;color:#1a8069;border:1px solid #aed9c4;background:#f3fff6;padding:7px 11px;border-radius:99px}.pill.cyber{color:#6b54a5;border-color:#d6c6f4;background:#f8f5ff}.date-mini{font-size:11px;color:#70847d;font-weight:700}.feature-card h3{font:800 23px/1.23 Manrope,system-ui;letter-spacing:-.8px;max-width:370px;margin:30px 0 9px;position:relative;z-index:1}.feature-card p{font-size:12px;color:#627a72;line-height:1.65;margin:0;max-width:360px;position:relative;z-index:1}.feature-card.cyber p{color:#766b89}.feature-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:23px;position:relative;z-index:1}.link-cta{display:inline-flex;gap:9px;align-items:center;text-decoration:none;font-size:12px;font-weight:800}.status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#688078}.status.is-read{color:var(--greenDark)}.status svg{height:15px;width:15px}
+.library-head{margin-top:38px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap}.library-head h2{font:800 23px Manrope;margin:0;letter-spacing:-.7px}.library-head .muted{color:var(--muted);font-size:13px;margin-top:5px}.filterbar{display:flex;flex-wrap:wrap;gap:8px;margin:19px 0}.filter{background:#fff;border:1px solid #e4eae6;border-radius:9px;padding:8px 14px;font-weight:700;font-size:12px;color:#718079}.filter.selected{color:#195d4b;background:#e1f3e9;border-color:#addbc7}.issue-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.issue-card{background:white;border:1px solid #e5ebe7;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;min-height:225px;transition:transform .15s,box-shadow .15s;box-shadow:var(--shadow)}.issue-card:hover{box-shadow:0 16px 35px rgba(25,45,42,.08)}.issue-card h3{font:800 17px/1.3 Manrope;margin:20px 0 10px;letter-spacing:-.35px}.issue-card p{font-size:12px;color:#73817f;margin:0 0 22px;line-height:1.68;flex:1}.issue-card .card-top .pill{background:#f7fcf9}.issue-card .card-top .pill.cyber{background:#faf8ff}.card-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #edf0ec;padding-top:15px}.read-time{display:flex;align-items:center;gap:6px;font-size:11px;color:#8b9994}.empty{padding:65px 25px;text-align:center;border:1px dashed #cadbd1;border-radius:19px;background:#fff}.empty h3{margin:8px 0}.empty p{color:var(--muted)}
+.article-wrap{max-width:845px;margin:0 auto}.backlink{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:#758782;font-size:12px;font-weight:700;margin-bottom:21px}.article-hero{background:#e8f5ed;border:1px solid #d7eee0;border-radius:23px;padding:36px 45px 40px;position:relative;overflow:hidden}.article-hero.cyber{background:#f0eafb;border-color:#e8dcf8}.article-hero:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;border:36px solid #73c7a324;top:-135px;right:-105px}.article-hero.cyber:after{border-color:#9870d81c}.article-hero h1{font:800 clamp(30px,3.8vw,43px)/1.18 Manrope,system-ui;letter-spacing:-1.8px;max-width:760px;margin:25px 0 13px;position:relative;z-index:1}.article-hero p{max-width:690px;color:#617c71;line-height:1.68;margin:0 0 20px;font-size:15px;position:relative;z-index:1}.article-hero.cyber p{color:#756b86}.article-meta{display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:12px;color:#587d6d;font-weight:700}.article-hero.cyber .article-meta{color:#716381}.article-content{background:white;border:1px solid #e7ece7;border-radius:19px;padding:42px 48px;margin-top:18px;box-shadow:var(--shadow)}.article-content h2{font:800 21px/1.35 Manrope;margin:35px 0 13px;letter-spacing:-.5px;color:#193038}.article-content h2:first-child{margin-top:0}.article-content h3{font:800 17px Manrope;margin:25px 0 10px}.article-content p,.article-content li{font-size:15px;color:#4d5e61;line-height:1.85}.article-content p{margin:10px 0 17px}.article-content ul,.article-content ol{padding-left:25px}.article-content li{margin:5px 0}.article-content strong{color:#263d40}.article-content code{background:#eef4f2;color:#186b5a;border-radius:5px;padding:3px 6px;font-size:13px;font-family:'SFMono-Regular',Consolas,monospace}.article-content pre{overflow:auto;background:#15252d;color:#d6efe3;padding:18px;border-radius:10px}.article-content pre code{color:inherit;background:none;padding:0}.content-divider{border:0;border-top:1px solid #ecf0ec;margin:27px 0}.article-panel{margin-top:18px;background:#fff;border:1px solid #e7ece7;border-radius:19px;padding:27px 32px;box-shadow:var(--shadow)}.panel-label{font-size:11px;color:#288f72;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}.panel-label.cyber{color:#7555b8}.article-panel h2{font:800 21px Manrope;margin:6px 0 20px;letter-spacing:-.45px}.takeaway-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}.takeaway-list li{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:#425457}.takeaway-list .num{width:25px;height:25px;flex:none;display:grid;place-items:center;background:#e9f6ef;border-radius:50%;color:#24896b;font-size:11px;font-weight:800}.article-hero.cyber~.article-panel .takeaway-list .num{background:#f1eaff;color:#7c5db5}.source-list{list-style:none;padding:0;margin:0;display:grid;gap:9px}.source-list a{display:flex;align-items:center;gap:9px;text-decoration:none;font-size:13px;color:#3b7770;font-weight:700;overflow-wrap:anywhere}.source-list a:hover{text-decoration:underline}.source-list svg{height:15px;width:15px}.q-block{border:1px solid #e7ece9;border-radius:13px;padding:17px 18px;margin:11px 0}.q-number{font-size:10px;font-weight:800;letter-spacing:1px;color:#87978d}.q-block h3{font-size:14px;font-weight:800;margin:5px 0 12px}.quiz-choice{display:flex;align-items:flex-start;gap:10px;border:1px solid #e9efeb;border-radius:9px;padding:9px 12px;margin-top:7px;cursor:pointer;color:#5b696a;font-size:13px}.quiz-choice:hover{background:#f8faf8}.quiz-choice input{accent-color:#27876d;margin-top:3px}.quiz-choice.correct{border-color:#b2e2cc;background:#effaf3;color:#246952}.quiz-choice.wrong{border-color:#edc9c9;background:#fff3f2;color:#9f4d4d}.feedback{font-size:12px;line-height:1.65;margin:10px 0 1px;color:#45685e}.quiz-buttons{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:19px;flex-wrap:wrap}.score{color:#23785e;font-size:13px;font-weight:800}.primary{border:0;border-radius:11px;background:#1c8b6a;color:#fff;font-size:13px;font-weight:800;min-height:43px;padding:0 20px;display:inline-flex;align-items:center;justify-content:center;gap:8px}.primary:hover{background:#177657}.primary:disabled{opacity:.45;cursor:not-allowed}.primary.cyber{background:#745db9}.primary.cyber:hover{background:#644ba6}.secondary{border:1px solid #dbe6df;border-radius:11px;background:#fff;color:#345a53;font-size:12px;font-weight:800;min-height:41px;padding:0 16px;display:inline-flex;gap:7px;align-items:center}.read-cta{margin-top:18px;background:#1a292f;color:#fff;padding:24px 28px;border-radius:18px;display:flex;align-items:center;justify-content:space-between;gap:18px}.read-cta h3{font:800 18px Manrope;margin:0 0 3px}.read-cta p{font-size:12px;color:#adbdc0;margin:0}.read-cta .primary{background:#b5efd3;color:#183c30}.read-cta .primary:hover{background:#98e6be}.read-cta.is-read{background:#e6f3ec;color:#23634c;border:1px solid #cde8d5}.read-cta.is-read p{color:#608a76}.read-cta.is-read .primary{background:#fff;color:#256f57;border:1px solid #b6d9c6}.adjacent{display:flex;justify-content:space-between;gap:10px;margin:25px 0}.adjacent a{text-decoration:none;font-size:12px;font-weight:800;color:#548478}
+.modal-backdrop{position:fixed;inset:0;background:rgba(8,18,22,.62);z-index:40;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)}.modal-backdrop.open{display:flex}.modal{background:white;box-shadow:0 25px 80px #07141844;border-radius:22px;width:min(650px,100%);max-height:89vh;overflow:auto;padding:27px 31px 30px}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:18px}.modal h2{font:800 23px Manrope;margin:0;letter-spacing:-.5px}.modal-sub{font-size:12px;color:#788980;margin:0 0 18px;line-height:1.65}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:6px;margin:9px 0}.field label{font-size:11px;color:#526860;font-weight:800}.field input,.field select,.field textarea{width:100%;border:1px solid #dce6df;border-radius:10px;padding:11px 12px;font-size:13px;background:white;color:#233a37;outline:none}.field textarea{min-height:95px;resize:vertical}.field textarea.long{min-height:150px}.field small{color:#829188;font-size:11px}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.divider{height:1px;background:#edf0ed;margin:23px 0}.info-box{background:#f1f8f3;padding:15px;border-radius:12px;font-size:12px;color:#4c7064;line-height:1.65}.toast{position:fixed;bottom:23px;right:23px;z-index:100;background:#15372e;color:#fff;border-radius:12px;padding:13px 17px;box-shadow:0 14px 34px #1e353346;font-size:13px;opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s}.toast.show{opacity:1;transform:translateY(0)}.mobile-menu{display:none}.mobile-overlay{display:none}
+@media(max-width:1100px){.layout{grid-template-columns:215px minmax(0,1fr)}.topbar{padding:0 26px}.main{padding:28px 26px 70px}.sidebar{padding:22px 13px}.feature-card{padding:23px}.feature-card h3{font-size:21px}}
+@media(max-width:800px){.layout{display:block}.sidebar{position:fixed;left:0;top:0;bottom:0;width:265px;transform:translateX(-110%);transition:transform .2s;box-shadow:12px 0 34px #0d22242b}.sidebar.open{transform:translateX(0)}.mobile-overlay.active{display:block;position:fixed;inset:0;background:#07161899;z-index:9}.mobile-menu{display:grid}.topbar{height:69px}.hero{grid-template-columns:1fr}.hero-art{display:none}.hero-intro{padding:9px 0 18px}.hero-intro h1{font-size:clamp(29px,6vw,43px)}.stats{margin-top:12px}}
+@media(max-width:570px){.main{padding:26px 17px 70px}.topbar{padding:0 16px}.top-date{font-size:12px}.top-kicker{font-size:9px}.search input{width:40px;padding-left:39px;background:#fff}.search:focus-within input{width:190px}.top-actions{gap:6px}.stats{gap:8px}.stat{padding:14px 12px}.stat strong{font-size:24px}.stat-icon{display:none}.featured,.issue-grid{grid-template-columns:1fr}.feature-card{min-height:245px}.feature-card h3{margin-top:23px}.article-hero{padding:26px 24px}.article-hero h1{font-size:29px;letter-spacing:-1.2px}.article-content{padding:25px 23px}.article-panel{padding:22px}.read-cta{align-items:flex-start;flex-direction:column}.form-grid{grid-template-columns:1fr}.modal{padding:22px}.hero-intro h1{letter-spacing:-1.4px}}
+@media print{.sidebar,.topbar,.backlink,.quiz-buttons,.read-cta,.adjacent,.toast,.modal-backdrop{display:none!important}.layout{display:block}.main{padding:0;max-width:none}.article-wrap{max-width:none}.article-hero,.article-content,.article-panel{box-shadow:none;break-inside:avoid}.article-panel{margin-top:10px}}
+.feed-status{font-size:11px;font-weight:650;color:#678278;white-space:nowrap}@media(max-width:860px){.feed-status{display:none}}
+</style>
+</head>
+<body>
+<div class="mobile-overlay" id="mobileOverlay"></div>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <a href="#accueil" class="brand"><span class="brand-mark">b<span style="font-size:16px">.</span></span><span class="brand-text">le<span>brief</span>.</span></a>
+    <div class="nav-label">ESPACE DE VEILLE</div>
+    <nav class="nav-group" id="mainNav">
+      <a href="#accueil" class="nav-link" data-view="accueil"><span data-icon="layout-dashboard"></span> Vue d'ensemble</a>
+      <a href="#fintech" class="nav-link" data-view="fintech"><span data-icon="credit-card"></span> Fintech & Paiements <span class="count" id="countFin"></span></a>
+      <a href="#cyber" class="nav-link" data-view="cyber"><span data-icon="shield"></span> IAM & Cyber <span class="count" id="countCyb"></span></a>
+    </nav>
+    <div class="nav-sep"></div>
+    <div class="nav-label">MA BIBLIOTHÈQUE</div>
+    <nav class="nav-group">
+      <a href="#non-lues" class="nav-link" data-view="non-lues"><span data-icon="book-open"></span> À lire <span class="count" id="countUnread"></span></a>
+      <a href="#lues" class="nav-link" data-view="lues"><span data-icon="check-circle"></span> Déjà lues <span class="count" id="countRead"></span></a>
+      <button class="nav-link" data-open="new" style="border:0;background:transparent;text-align:left"><span data-icon="plus"></span> Ajouter une édition</button>
+    </nav>
+    <div class="side-bottom"><div class="schedule-note"><div class="eyebrow">TON RITUEL</div><h4>Un peu chaque matin.</h4><p>Deux domaines, un seul espace pour lire, comprendre et retenir.</p></div><div class="side-foot">Du lundi au vendredi · Suivi local · Flux JSON</div></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><div style="display:flex;align-items:center;gap:12px"><button id="mobileMenu" class="icon-button mobile-menu" aria-label="Ouvrir le menu"><span data-icon="menu"></span></button><div><div class="top-kicker">VOTRE RENDEZ-VOUS DU MATIN</div><div class="top-date" id="currentDate"></div></div></div><div class="top-actions"><span id="feedStatus" class="feed-status" title="Statut de la bibliothèque publiée">Vérification du flux…</span><button id="syncFeed" class="icon-button" title="Actualiser les éditions" aria-label="Actualiser les éditions"><span data-icon="refresh"></span></button><div class="search"><span data-icon="search"></span><input id="search" type="search" aria-label="Rechercher une édition" placeholder="Rechercher..." autocomplete="off"></div><button class="icon-button" data-open="data" title="Sauvegarde et import" aria-label="Sauvegarde et import"><span data-icon="database"></span></button><button class="icon-button" data-open="new" title="Nouvelle édition" aria-label="Nouvelle édition"><span data-icon="plus"></span></button></div></header>
+    <main class="main" id="app" aria-live="polite"></main>
+  </div>
+</div>
+<div class="modal-backdrop" id="modalBackdrop" role="presentation"><div class="modal" id="modalBody" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" role="status"></div>
+<script id="seedData" type="application/json">[
+  {
+    "id": "fin-001",
+    "category": "fintech",
+    "date": "2026-10-23",
+    "number": 1,
+    "title": "Les agents IA commencent à gérer les paiements",
+    "summary": "Stripe, PPRO et Klarna illustrent trois évolutions : les agents financiers, l’authentification agentique et le change au checkout.",
+    "minutes": 5,
+    "content": "## Ce qui change\nEn octobre 2026, plusieurs initiatives convergent : des agents IA peuvent préparer davantage d’opérations financières et les infrastructures de paiement commencent à s’adapter à des parcours sans navigation humaine classique.\n\n**Stripe Treasury for agents**, annoncé le 21 octobre, vise à permettre à des agents de consulter des soldes et d’effectuer certaines opérations financières, avec des contrôles de permissions et d’approbation. Les capacités annoncées doivent être distinguées des fonctionnalités effectivement disponibles chez chaque client.\n\nLe 21 octobre également, PPRO a annoncé un groupe de travail avec plusieurs acteurs des paiements locaux pour réfléchir à l’authentification, au consentement délégué et aux litiges dans le commerce agentique. Il s’agit d’un chantier de standardisation, pas d’un protocole déjà universellement déployé.\n\n## Pourquoi c’est intéressant pour l’architecture\nDans un paiement classique, l’utilisateur confirme directement son choix. Avec un agent, il faut **identifier qui agit**, vérifier **ce qui a été autorisé** et savoir **quand exiger une validation humaine**.\n\nLa distinction entre *préparer une opération* et *l’exécuter* devient essentielle. Une API financière exposée à un agent doit appliquer des contrôles métiers côté serveur, même si l’agent annonce disposer d’une autorisation.\n\n## Exemple concret\nUn agent prépare un virement de 450 €. Avant son exécution, la plateforme vérifie les droits, le bénéficiaire, le plafond autorisé et, si nécessaire, demande une approbation humaine. Chaque tentative reçoit un identifiant unique pour permettre son audit.\n\nAutre enjeu à suivre : la **conversion de devises**. Le taux de change indiqué au moment du checkout peut différer du taux appliqué lors de la capture. Le modèle de données doit donc conserver la devise de commande, la devise de règlement et les taux réellement utilisés.",
+    "takeaways": [
+      "L’agent prépare ; le serveur financier autorise.",
+      "Le consentement doit être limité et auditable.",
+      "Les taux de change et les états de paiement évoluent."
+    ],
+    "sources": [
+      {
+        "title": "Stripe — Treasury for agents",
+        "url": "https://stripe.com/en-de/newsroom/news/treasury-for-agents"
+      },
+      {
+        "title": "PPRO — Local Payments Council",
+        "url": "https://www.ppro.com/news/ppro-launches-local-payments-council-for-agentic-commerce/"
+      },
+      {
+        "title": "Stripe — Documentation de paiement",
+        "url": "https://docs.stripe.com/payments"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Quel composant doit appliquer les limites de paiement ?",
+        "options": [
+          "Le modèle IA uniquement",
+          "Le serveur financier / PSP",
+          "L’interface graphique"
+        ],
+        "answer": 1,
+        "explanation": "Les contrôles ne doivent pas dépendre de la seule déclaration de l’agent."
+      },
+      {
+        "question": "Quel sujet PPRO veut-il traiter ?",
+        "options": [
+          "L’identité et le consentement des agents",
+          "Le remplacement des cartes par le cash",
+          "La gestion des GPO"
+        ],
+        "answer": 0,
+        "explanation": "Le groupe de travail vise les particularités des moyens de paiement locaux."
+      },
+      {
+        "question": "Un taux FX affiché au checkout est-il toujours définitif ?",
+        "options": [
+          "Oui",
+          "Non, cela dépend du parcours",
+          "Il n’y a jamais de conversion"
+        ],
+        "answer": 1,
+        "explanation": "La capture peut fixer un taux différent selon le produit et le contrat."
+      }
+    ],
+    "tag": "Actualités"
+  },
+  {
+    "id": "fin-002",
+    "category": "fintech",
+    "date": "2026-10-26",
+    "number": 2,
+    "title": "Payplug, Instant Checkout et ACP : le vrai état des lieux",
+    "summary": "Un dossier spécial sur ce qui existe, ce qui reste en bêta et ce qu’une architecture fintech doit préparer.",
+    "minutes": 9,
+    "content": "## La distinction essentielle : annoncé, documenté, disponible\nLe commerce agentique promet de permettre à un utilisateur de demander à une IA de trouver un produit puis de l’acheter. **Mais un protocole public ou une démonstration ne signifie pas un service ouvert à tous.**\n\n**Payplug**, acteur français du paiement lié à BPCE, dispose d’une activité opérationnelle de PSP e-commerce. Ses travaux relatifs au commerce agentique comprennent un serveur MCP en développement et une participation annoncée aux réflexions autour d’AP2 de Google. Cela ne prouve pas qu’un checkout agentique Payplug soit généralement disponible en France.\n\n**Instant Checkout dans ChatGPT** a été lancé en septembre 2025, initialement dans un périmètre américain limité. En mars 2026, OpenAI a annoncé une évolution de sa stratégie vers la découverte de produits et le maintien d’un checkout davantage contrôlé par les marchands. La documentation du protocole continue de décrire des intégrations réservées à des partenaires ou à des bêtas : il ne faut pas confondre leur existence avec un lancement général.\n\n## ACP, AP2, UCP et MCP\n- **ACP (OpenAI/Stripe)** structure les échanges liés au catalogue, au checkout et aux paiements délégués.\n- **AP2 (Google et partenaires)** travaille sur des mandats et des preuves d’autorisation de paiements par agents.\n- **UCP (Google/Shopify)** vise l’interopérabilité du commerce, du panier au suivi de commande.\n- **MCP** expose des outils à des agents IA ; il n’assure pas, à lui seul, la sécurité ou la conformité d’un paiement.\n\n## À quoi ressemble un achat agentique ?\n1. L’agent découvre un produit dans un catalogue.\n2. Le marchand recalcule le prix et ouvre une session de checkout.\n3. Le client valide l’achat ou une délégation précisément encadrée.\n4. La plateforme transmet les données ou un token de paiement limité.\n5. Le marchand demande l’autorisation au PSP, puis suit l’état via événements/webhooks.\n\n## Priorités pour une architecte fintech\n**Tout de suite :** prototyper un checkout fictif avec idempotence et état de paiement. **Dans les 3 à 6 mois :** suivre la disponibilité réelle des intégrations françaises et la prise en charge de SCA/3DS. **À plus long terme :** isoler les protocoles agentiques derrière des adaptateurs pour ne pas rendre le cœur du système dépendant d’un fournisseur.\n\nPour les opérations financières, toujours vérifier les identifiants de corrélation, la provenance du consentement, la révocation possible et la réconciliation entre marchand et PSP.",
+    "takeaways": [
+      "Protocole publié ≠ produit disponible à tous.",
+      "ACP, AP2, UCP et MCP ont des rôles distincts.",
+      "L’architecture doit rester indépendante du canal IA."
+    ],
+    "sources": [
+      {
+        "title": "OpenAI — Annonce Instant Checkout (2025)",
+        "url": "https://openai.com/index/buy-it-in-chatgpt/"
+      },
+      {
+        "title": "OpenAI — Commerce pour développeurs",
+        "url": "https://developers.openai.com/commerce"
+      },
+      {
+        "title": "Payplug — Site officiel",
+        "url": "https://www.payplug.com/fr/"
+      },
+      {
+        "title": "Stripe — Documentation développeur",
+        "url": "https://docs.stripe.com/"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "MCP suffit-il à autoriser un paiement ?",
+        "options": [
+          "Oui",
+          "Non, il faut des contrôles distincts",
+          "Seulement en Europe"
+        ],
+        "answer": 1,
+        "explanation": "MCP est un mécanisme d’interaction avec des outils, pas une autorisation financière."
+      },
+      {
+        "question": "Qui recalcule le prix final d’un panier ?",
+        "options": [
+          "L’agent uniquement",
+          "Le marchand",
+          "Le navigateur"
+        ],
+        "answer": 1,
+        "explanation": "Le marchand reste la source de vérité de ses montants et conditions commerciales."
+      },
+      {
+        "question": "Que prouve un pilote réussi ?",
+        "options": [
+          "La faisabilité dans un périmètre",
+          "La disponibilité générale mondiale",
+          "La conformité pour tous les pays"
+        ],
+        "answer": 0,
+        "explanation": "Un pilote ne démontre pas un déploiement commercial global."
+      }
+    ],
+    "tag": "Dossier spécial"
+  },
+  {
+    "id": "fin-003",
+    "category": "fintech",
+    "date": "2026-10-27",
+    "number": 3,
+    "title": "Revolut : la gouvernance avant la mise en production",
+    "summary": "Un rappel utile : lancer un produit bancaire exige des contrôles de risque, de conformité et de traçabilité.",
+    "minutes": 4,
+    "content": "## Le fait à connaître\nLe 27 octobre 2026, la presse financière a rapporté des informations sur un examen indépendant de procédures de validation de nouveaux produits de Revolut par le régulateur britannique. Il convient de traiter cette information comme **une enquête rapportée**, et non comme une sanction réglementaire établie.\n\nLa problématique est plus générale : une banque numérique ne peut pas évaluer un lancement uniquement sur des métriques de performance ou de conversion. Elle doit également considérer les risques opérationnels et réglementaires.\n\n## Le concept : Product Governance\nPrenons un service de crédit instantané. Son parcours comprend typiquement :\n\n**Application → API de crédit → Scoring → Décision → Contrat → Ledger → Décaissement**\n\nAvant le lancement, les équipes doivent définir qui valide le modèle de risque, comment les décisions sont auditables, comment les données sont protégées et que faire si le décaissement ou la comptabilisation échoue.\n\nPour une architecte, la question la plus utile n’est pas seulement « l’API répond-elle ? », mais **« peut-on prouver que chaque décision a été prise conformément aux contrôles approuvés ? »**\n\n## Lien avec le commerce agentique\nLes nouveaux paiements initiés par des agents IA devront aussi démontrer l’identité de l’acteur, le consentement, les limites de paiement et les actions réalisées. Un pilote concluant ne remplace pas le processus d’approbation du produit et du risque.\n\n**Analyse :** intégrer les contrôles dès la conception évite de découvrir en production que les preuves de décision, les journaux de fraude ou les mécanismes d’annulation sont insuffisants.",
+    "takeaways": [
+      "Un audit rapporté n’est pas une sanction.",
+      "La gouvernance produit est aussi un sujet technique.",
+      "La traçabilité doit être conçue avant le lancement."
+    ],
+    "sources": [
+      {
+        "title": "Revolut — Actualités officielles",
+        "url": "https://www.revolut.com/news/"
+      },
+      {
+        "title": "Bank of England — Prudential Regulation Authority",
+        "url": "https://www.bankofengland.co.uk/prudential-regulation"
+      },
+      {
+        "title": "FCA — Product governance",
+        "url": "https://www.fca.org.uk/firms/product-governance"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Un audit réglementaire prouve-t-il une infraction ?",
+        "options": [
+          "Toujours",
+          "Non",
+          "Seulement pour une néobanque"
+        ],
+        "answer": 1,
+        "explanation": "Un audit peut examiner des contrôles sans établir de manquement."
+      },
+      {
+        "question": "Que doit conserver un moteur de crédit ?",
+        "options": [
+          "Uniquement le montant",
+          "Une trace explicable de la décision",
+          "Le dernier écran seulement"
+        ],
+        "answer": 1,
+        "explanation": "La traçabilité permet audits et contrôles."
+      },
+      {
+        "question": "Un pilote agentique suffit-il pour un déploiement global ?",
+        "options": [
+          "Oui",
+          "Non",
+          "Si l’interface est belle"
+        ],
+        "answer": 1,
+        "explanation": "Il reste les enjeux opérationnels, commerciaux et réglementaires."
+      }
+    ],
+    "tag": "Analyse"
+  },
+  {
+    "id": "fin-004",
+    "category": "fintech",
+    "date": "2026-10-28",
+    "number": 4,
+    "title": "Un achat agentique, de la recherche au paiement",
+    "summary": "Le déroulement technique entre l’agent, le marchand et le PSP, avec un cas de timeout à anticiper.",
+    "minutes": 4,
+    "content": "## Un parcours en cinq étapes\nUne cliente demande à un agent d’acheter des chaussures à 95 €.\n\n1. **Découverte :** l’agent consulte un catalogue et identifie le produit.\n2. **Checkout :** il demande au marchand de créer une session. Le marchand recalcule prix, taxes et livraison.\n3. **Consentement :** la cliente confirme son achat et, si le parcours le prévoit, autorise l’émission d’un token délégué.\n4. **Paiement :** le marchand soumet l’opération au PSP, qui applique ses contrôles.\n5. **Confirmation :** la commande est suivie par des états et des notifications asynchrones.\n\n## Pourquoi un token délégué ?\nLes *Shared Payment Tokens* de Stripe illustrent une approche dans laquelle l’agent ne reçoit pas les coordonnées bancaires brutes. Le token peut être limité à un marchand, un montant et une durée.\n\nMais un token n’est pas une preuve universelle de consentement, ni une garantie qu’un parcours SCA européen est satisfait.\n\n## Le cas qui casse les intégrations naïves\nLe PSP accepte le paiement, mais le serveur marchand ne reçoit pas la réponse à temps.\n\n**Timeout ≠ paiement échoué.** Si l’agent retente sans contrôle, il peut provoquer une double opération.\n\nUn système robuste conserve un identifiant de transaction, utilise une clé d’idempotence et interroge l’état réel avant toute nouvelle tentative. Il rapproche ensuite la commande du paiement avec les webhooks du PSP.\n\n**Conséquence architecture :** `checkout_session_id`, `order_id` et `payment_id` doivent être corrélés dans des journaux exploitables.",
+    "takeaways": [
+      "L’agent orchestre, le marchand calcule, le PSP traite.",
+      "Le token limite l’exposition des données bancaires.",
+      "Timeout ne signifie jamais automatiquement échec."
+    ],
+    "sources": [
+      {
+        "title": "OpenAI — Commerce pour développeurs",
+        "url": "https://developers.openai.com/commerce"
+      },
+      {
+        "title": "Stripe — Documentation paiements",
+        "url": "https://docs.stripe.com/payments"
+      },
+      {
+        "title": "Stripe — Idempotent requests",
+        "url": "https://docs.stripe.com/api/idempotent_requests"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Qui recalcule le prix du panier ?",
+        "options": [
+          "Le marchand",
+          "L’agent",
+          "La banque centrale"
+        ],
+        "answer": 0,
+        "explanation": "Le marchand reste responsable du prix final."
+      },
+      {
+        "question": "Pourquoi limiter un token de paiement ?",
+        "options": [
+          "Pour cacher l’adresse de livraison",
+          "Pour encadrer son usage",
+          "Pour éviter tout webhook"
+        ],
+        "answer": 1,
+        "explanation": "Il peut être lié à un marchand, un montant et une période."
+      },
+      {
+        "question": "Après un timeout de paiement, que vérifier ?",
+        "options": [
+          "L’état de la transaction",
+          "Seulement le frontend",
+          "Le nom de la boutique"
+        ],
+        "answer": 0,
+        "explanation": "Il faut réconcilier l’état avant de retenter."
+      }
+    ],
+    "tag": "Décryptage"
+  },
+  {
+    "id": "fin-005",
+    "category": "fintech",
+    "date": "2026-10-29",
+    "number": 5,
+    "title": "Revolut Pay chez Just Eat : pourquoi les webhooks comptent",
+    "summary": "Un paiement plus fluide côté client ne doit pas compromettre la fiabilité du backend marchand.",
+    "minutes": 4,
+    "content": "## L’actualité\nUne annonce du 28 octobre 2026 présente l’intégration de **Revolut Pay** chez Just Eat au Royaume-Uni et en Irlande. Le parcours met en avant un paiement simplifié depuis le compte Revolut et une authentification adaptée au parcours client. Il ne faut pas extrapoler cette intégration au marché français.\n\nRevolut Pay peut prendre en charge différentes méthodes selon les intégrations ; on ne doit donc pas le réduire systématiquement à un paiement bancaire Account-to-Account.\n\n## Pourquoi c’est intéressant\nUn parcours où l’utilisateur ne ressaisit pas ses coordonnées bancaires peut réduire la friction. Mais les bonnes performances du checkout ne suffisent pas si le système de commande n’est pas correctement synchronisé avec les opérations financières.\n\n## Le problème de l’asynchronisme\nL’application marchande peut afficher un écran « paiement effectué », tandis que son serveur attend encore la confirmation fiable du PSP.\n\nPour une opération critique, l’architecture doit s’appuyer sur des notifications serveur, vérifier leur authenticité et s’assurer que leur traitement est **idempotent**.\n\nDeux événements peuvent arriver dans un ordre inattendu. Par exemple, un statut indiquant que l’opération est terminée pourrait être reçu avant un événement antérieur retardé.\n\n**Exemple :** si `ORDER_COMPLETED` a déjà permis de valider une commande, l’arrivée tardive de `ORDER_AUTHORISED` ne doit jamais provoquer une deuxième livraison.\n\n**Analyse architecture :** modéliser des transitions d’état autorisées, stocker les événements traités et prévoir une réconciliation périodique avec le PSP. Cette approche s’applique aussi aux paiements agentiques et aux autres PSP.",
+    "takeaways": [
+      "L’expérience A2A peut réduire les frictions.",
+      "Une confirmation frontend n’est pas une vérité financière.",
+      "Les webhooks sont asynchrones et peuvent être désordonnés."
+    ],
+    "sources": [
+      {
+        "title": "Revolut Developer — Documentation marchand",
+        "url": "https://developer.revolut.com/docs/merchant/"
+      },
+      {
+        "title": "Revolut Business — Revolut Pay",
+        "url": "https://www.revolut.com/business/revolut-pay/"
+      },
+      {
+        "title": "Just Eat Takeaway.com — Corporate",
+        "url": "https://www.justeattakeaway.com/"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Quel composant doit confirmer le paiement ?",
+        "options": [
+          "Le CSS",
+          "Le backend via des preuves PSP",
+          "Le navigateur uniquement"
+        ],
+        "answer": 1,
+        "explanation": "La décision métier doit reposer sur une confirmation serveur fiable."
+      },
+      {
+        "question": "L’ordre d’arrivée des événements est-il toujours garanti ?",
+        "options": [
+          "Oui",
+          "Non",
+          "Uniquement le lundi"
+        ],
+        "answer": 1,
+        "explanation": "Les réseaux et retries peuvent réordonner les notifications."
+      },
+      {
+        "question": "Que protège un traitement idempotent ?",
+        "options": [
+          "Des doublons d’actions",
+          "Des erreurs de grammaire",
+          "Des paiements en devises"
+        ],
+        "answer": 0,
+        "explanation": "Le même événement ne doit produire qu’un effet métier."
+      }
+    ],
+    "tag": "Actualité"
+  },
+  {
+    "id": "cyb-001",
+    "category": "cyber",
+    "date": "2026-10-23",
+    "number": 1,
+    "title": "SSO, fédération et provisioning : trois rôles différents",
+    "summary": "Authentifier un utilisateur n’est pas la même chose que créer et retirer son compte applicatif.",
+    "minutes": 4,
+    "content": "## Le problème\nUn collaborateur quitte l’entreprise. Son compte Okta est désactivé, mais un compte peut encore exister dans certaines applications SaaS. Comment est-ce possible alors que l’entreprise utilise le SSO ?\n\nC’est parce que **SSO, fédération et provisioning n’ont pas le même rôle**.\n\n- **SSO (Single Sign-On)** : permet de s’authentifier à plusieurs applications sans ressaisir les identifiants à chaque fois.\n- **Fédération d’identité** : établit une relation de confiance entre l’application (SP) et un fournisseur d’identité (IdP), souvent avec SAML ou OIDC.\n- **Provisioning** : gère le cycle de vie des comptes et groupes, souvent par SCIM ou API.\n\n## Deux flux complémentaires\n**Flux d’authentification :** utilisateur → application → Okta → preuve SAML/OIDC → application → session.\n\n**Flux de provisioning :** système RH/annuaire → outil IAM → SCIM → création, mise à jour ou désactivation d’un compte SaaS.\n\nUn fournisseur SaaS peut aussi créer automatiquement un compte à la première connexion (*Just-in-Time provisioning*). Cela ne suffit pas à garantir une gestion complète des départs.\n\n## Le risque cyber\nLa désactivation centrale ne révoque pas systématiquement les sessions déjà ouvertes. Une authentification locale pourrait également subsister sur certaines applications.\n\n**Conséquence architecture :** lors d’une intégration SaaS, il faut tester l’authentification fédérée, la désactivation applicative et la révocation des sessions comme trois scénarios distincts.",
+    "takeaways": [
+      "SSO : accès simplifié à plusieurs applications.",
+      "Fédération : confiance entre IdP et application.",
+      "SCIM : création et retrait de comptes."
+    ],
+    "sources": [
+      {
+        "title": "Microsoft Learn — User provisioning",
+        "url": "https://learn.microsoft.com/en-us/entra/identity/app-provisioning/user-provisioning"
+      },
+      {
+        "title": "RFC 7644 — SCIM 2.0",
+        "url": "https://www.rfc-editor.org/rfc/rfc7644"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Le SSO désactive-t-il tous les comptes SaaS ?",
+        "options": [
+          "Oui",
+          "Pas nécessairement",
+          "Seulement avec Kerberos"
+        ],
+        "answer": 1,
+        "explanation": "Le provisioning et les sessions demandent des contrôles distincts."
+      }
+    ],
+    "tag": "Fondamentaux"
+  },
+  {
+    "id": "cyb-002",
+    "category": "cyber",
+    "date": "2026-10-26",
+    "number": 2,
+    "title": "Kerberos : comment Windows s’authentifie avec des tickets",
+    "summary": "TGT, KDC et tickets de service : la mécanique derrière une grande partie du SSO Windows.",
+    "minutes": 4,
+    "content": "## Pourquoi Kerberos ?\nUne collaboratrice ouvre une session Windows puis accède à un partage réseau. Elle ne ressaisit pas son mot de passe : **Kerberos permet l’authentification par tickets cryptographiques**.\n\nTrois acteurs interviennent : le client Windows, le **KDC** situé sur les contrôleurs de domaine Active Directory et le serveur cible.\n\n## Le fonctionnement\n1. Le client s’authentifie auprès du KDC en prouvant qu’il dispose des informations nécessaires.\n2. Il obtient un **TGT (Ticket Granting Ticket)**.\n3. Il demande au KDC un ticket pour un service particulier.\n4. Il présente le ticket au serveur, qui peut généralement le valider sans interroger systématiquement AD.\n\n**AD** est l’annuaire ; **LDAP** permet notamment de le consulter ; **Kerberos** est un protocole d’authentification.\n\n## Le risque : Kerberoasting\nUn attaquant ayant déjà un compte dans le domaine peut demander certains tickets de service et essayer hors ligne de retrouver le secret d’un compte de service faiblement protégé.\n\nLes mesures de réduction du risque comprennent des comptes de service managés, des secrets robustes, le moindre privilège et la surveillance des demandes de tickets inhabituelles.\n\n**Conséquence architecture :** lors de la modernisation d’une application qui utilise Kerberos, il faut inventorier ses dépendances AD et prévoir les modalités de migration vers OIDC ou SAML si nécessaire.",
+    "takeaways": [
+      "Kerberos repose sur des tickets, pas des mots de passe partagés partout.",
+      "KDC et TGT facilitent le SSO Windows.",
+      "Les comptes de service faibles sont une cible importante."
+    ],
+    "sources": [
+      {
+        "title": "Microsoft — Kerberos overview",
+        "url": "https://learn.microsoft.com/en-us/windows-server/security/kerberos/kerberos-authentication-overview"
+      },
+      {
+        "title": "MITRE ATT&CK — Kerberoasting",
+        "url": "https://attack.mitre.org/techniques/T1558/003/"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Quel élément délivre les tickets Kerberos ?",
+        "options": [
+          "Le KDC",
+          "Le navigateur",
+          "Le routeur"
+        ],
+        "answer": 0,
+        "explanation": "Le KDC délivre notamment TGT et tickets de service."
+      }
+    ],
+    "tag": "Protocole"
+  },
+  {
+    "id": "cyb-003",
+    "category": "cyber",
+    "date": "2026-10-27",
+    "number": 3,
+    "title": "Passkeys et FIDO2 : pourquoi le phishing devient plus difficile",
+    "summary": "Clés publiques, clés privées et vérification du domaine : le passwordless expliqué simplement.",
+    "minutes": 4,
+    "content": "## Le problème du MFA classique\nUn faux site de connexion peut parfois voler un mot de passe et un code MFA à usage unique en temps réel. Les passkeys FIDO2 offrent une meilleure résistance grâce à une preuve cryptographique **liée au domaine légitime**.\n\n## Comment fonctionne une passkey ?\nLors de l’enrôlement, l’authentificateur crée une paire de clés :\n\n- **Clé privée** conservée par l’authentificateur ; elle n’est pas envoyée au site.\n- **Clé publique** enregistrée auprès du fournisseur d’identité.\n\nÀ la connexion, le serveur envoie un défi (*challenge*). Après vérification locale de l’utilisateur par PIN ou biométrie, l’authentificateur signe le défi. Le serveur vérifie la signature grâce à la clé publique.\n\nL’authentificateur tient également compte de l’origine du site. Une page de phishing sur un autre domaine ne peut pas réutiliser la passkey destinée au véritable portail.\n\n## Et Okta FastPass ?\nUne **passkey FIDO2**, **Windows Hello** et **Okta FastPass** ne sont pas synonymes.\n\nWindows Hello permet la vérification locale de l’utilisateur sur Windows. FastPass est un authentificateur Okta, qui peut exploiter des clés cryptographiques et des signaux de l’appareil. Les niveaux de sécurité effectifs dépendent de sa configuration et des politiques imposées.\n\n## Point d’attention\nMême avec du passwordless, une méthode de secours trop faible peut réduire la sécurité globale. La protection contre le vol de session et les processus de récupération restent essentiels.",
+    "takeaways": [
+      "Une passkey s’appuie sur une paire de clés.",
+      "La preuve est liée au domaine légitime.",
+      "Passwordless ne dispense pas de sécuriser les sessions."
+    ],
+    "sources": [
+      {
+        "title": "FIDO Alliance — Passkeys",
+        "url": "https://fidoalliance.org/passkeys/"
+      },
+      {
+        "title": "Microsoft Learn — FIDO2 passkeys",
+        "url": "https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-enable-passkey-fido2"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Pourquoi une passkey résiste-t-elle mieux au phishing ?",
+        "options": [
+          "Elle expire après 2 secondes",
+          "Elle est liée cryptographiquement au bon site",
+          "Elle envoie le mot de passe plus vite"
+        ],
+        "answer": 1,
+        "explanation": "La vérification de l’origine empêche la réutilisation sur un faux domaine."
+      }
+    ],
+    "tag": "Authentification"
+  },
+  {
+    "id": "cyb-004",
+    "category": "cyber",
+    "date": "2026-10-28",
+    "number": 4,
+    "title": "Fédération Okta → Entra : qui vérifie le MFA ?",
+    "summary": "Quand Entra accepte une preuve MFA d’Okta : comprendre la relation de confiance entre IdP.",
+    "minutes": 4,
+    "content": "## Le scénario\nUne organisation utilise Okta comme fournisseur d’identité principal et Microsoft Entra ID pour contrôler l’accès à Microsoft 365.\n\nAprès une authentification FastPass chez Okta, **Entra ID peut reconnaître une preuve MFA contenue dans une assertion fédérée** au lieu d’exiger systématiquement un nouveau facteur.\n\n## Le parcours\n1. L’utilisateur demande l’accès à Microsoft 365.\n2. Entra ID le redirige vers Okta.\n3. Okta authentifie l’utilisateur et applique sa politique MFA.\n4. Okta émet une assertion signée contenant des informations d’authentification.\n5. Entra vérifie cette assertion et applique ses propres règles d’accès.\n\nDans des parcours SAML/WS-Federation, une indication MFA peut notamment utiliser la valeur `http://schemas.microsoft.com/claims/multipleauthn`.\n\n## Le paramètre à connaître\nLa configuration **`federatedIdpMfaBehavior`** indique comment Entra traite les preuves MFA de l’IdP fédéré :\n\n- `acceptIfMfaDoneByFederatedIdp` : accepte la preuve si elle est présente et peut appliquer son MFA autrement.\n- `enforceMfaByFederatedIdp` : privilégie l’exécution du MFA chez le fournisseur fédéré.\n- `rejectMfaByFederatedIdp` : ne compte pas la preuve MFA fédérée.\n\nCe paramètre ne rend pas, à lui seul, le MFA obligatoire.\n\n## Le risque\nUne preuve générique « MFA effectué » ne garantit pas automatiquement une méthode résistante au phishing. Un SMS et une passkey n’ont pas le même niveau de sécurité.\n\n**Conséquence architecture :** tester les assertions reçues, les politiques Okta et le traitement d’exception Entra pour vérifier qu’une preuve insuffisante ne devient pas un contournement.",
+    "takeaways": [
+      "Entra peut accepter une preuve MFA de l’IdP.",
+      "La confiance est configurable, jamais implicite.",
+      "MFA ne signifie pas nécessairement anti-phishing."
+    ],
+    "sources": [
+      {
+        "title": "Microsoft Learn — Fédération et MFA",
+        "url": "https://learn.microsoft.com/en-us/entra/identity/authentication/howto-mfa-federation"
+      },
+      {
+        "title": "Microsoft Graph — Internal domain federation",
+        "url": "https://learn.microsoft.com/en-us/graph/api/resources/internaldomainfederation?view=graph-rest-1.0"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Entra impose-t-il toujours un deuxième MFA ?",
+        "options": [
+          "Oui",
+          "Non, selon la fédération et ses règles",
+          "Seulement si SAML est désactivé"
+        ],
+        "answer": 1,
+        "explanation": "La preuve de l’IdP fédéré peut satisfaire l’exigence MFA."
+      }
+    ],
+    "tag": "Fédération"
+  },
+  {
+    "id": "cyb-005",
+    "category": "cyber",
+    "date": "2026-10-29",
+    "number": 5,
+    "title": "SCIM 2.0 : désactiver un compte SaaS correctement",
+    "summary": "Pourquoi SSO et déprovisionnement ne sont pas la même opération, et ce que change `active=false`.",
+    "minutes": 4,
+    "content": "## Le besoin\nUn collaborateur quitte l’entreprise. Son accès SSO est bloqué, mais les comptes applicatifs et certaines sessions peuvent rester actifs.\n\n**SCIM 2.0** est un standard basé sur HTTP et JSON qui automatise le cycle de vie des comptes et groupes auprès des applications compatibles.\n\n## Exemple concret\nLe système IAM peut demander à une application SaaS de désactiver un utilisateur avec :\n\n```http\nPATCH /scim/v2/Users/123\n```\n\nEn utilisant une opération `PatchOp` qui définit l’attribut `active` à `false`.\n\nSCIM permet aussi la création, la modification et, selon les implémentations, la gestion des appartenances à des groupes.\n\n## Trois limites à anticiper\n**1. Propagation différée.** Les connecteurs de provisioning peuvent fonctionner par cycles et accumuler des erreurs ou retards.\n\n**2. États différents.** Suspendre un compte, le désactiver et le retirer d’une application ne déclenchent pas nécessairement les mêmes actions dans les outils IAM.\n\n**3. Sessions ouvertes.** La désactivation du compte applicatif ne prouve pas que toutes les sessions et tokens existants sont immédiatement révoqués.\n\n## Application pour une architecte IAM\nPour chaque SaaS, vérifier la source de vérité des identités, les événements JML (*Joiner–Mover–Leaver*), la fréquence du provisioning, les traitements d’erreur, le suivi des comptes orphelins et la possibilité de révoquer les sessions en urgence.\n\n**À retenir :** SCIM automatise le compte ; SAML et OIDC gèrent l’authentification fédérée. La sécurisation du départ d’un collaborateur exige souvent les deux, plus la gestion des sessions.",
+    "takeaways": [
+      "SCIM gère le cycle de vie des comptes.",
+      "La désactivation peut être différée.",
+      "Les sessions exigent un contrôle distinct."
+    ],
+    "sources": [
+      {
+        "title": "RFC 7644 — SCIM 2.0",
+        "url": "https://www.rfc-editor.org/rfc/rfc7644"
+      },
+      {
+        "title": "Microsoft Learn — Provisioning",
+        "url": "https://learn.microsoft.com/en-us/entra/identity/app-provisioning/how-provisioning-works"
+      },
+      {
+        "title": "Okta — SCIM integration",
+        "url": "https://developer.okta.com/docs/guides/scim-provisioning-integration-prepare/"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "SCIM révoque-t-il immédiatement toutes les sessions ?",
+        "options": [
+          "Toujours",
+          "Non, cela dépend aussi des applications",
+          "Oui, si SAML est activé"
+        ],
+        "answer": 1,
+        "explanation": "Le provisioning et la révocation des sessions sont deux mécanismes distincts."
+      }
+    ],
+    "tag": "Provisioning"
+  }
+]</script>
+<script>
+'use strict';
+const ICONS={
+'layout-dashboard':'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+'credit-card':'<rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/>',
+'shield':'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/>',
+'book-open':'<path d="M12 7c-2-2-5-3-9-2v14c4-1 7 0 9 2 2-2 5-3 9-2V5c-4-1-7 0-9 2Z"/><path d="M12 7v14"/>',
+'check-circle':'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+'refresh':'<path d="M20 7v5h-5M4 17v-5h5"/><path d="M5 9a8 8 0 0 1 13-3l2 2M4 16l2 2a8 8 0 0 0 13-3"/>',
+'plus':'<path d="M12 5v14M5 12h14"/>',
+'menu':'<path d="M4 7h16M4 12h16M4 17h16"/>',
+'database':'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v7c0 1.7 4 3 9 3s9-1.3 9-3V5M3 12v7c0 1.7 4 3 9 3s9-1.3 9-3v-7"/>',
+'search':'<circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/>',
+'arrow-right':'<path d="M4 12h16m-6-6 6 6-6 6"/>',
+'arrow-left':'<path d="M20 12H4m6-6-6 6 6 6"/>',
+'clock':'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+'external':'<path d="M14 4h6v6m0-6-9 9"/><path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5"/>',
+'x':'<path d="M18 6 6 18M6 6l12 12"/>',
+'file':'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8m-8 4h8m-8 4h5"/>',
+'bookmark':'<path d="M5 3h14v19l-7-4-7 4V3Z"/>',
+'download':'<path d="M12 3v12m-4-4 4 4 4-4M4 17v3h16v-3"/>',
+'upload':'<path d="M12 17V5m-4 4 4-4 4 4M4 17v3h16v-3"/>',
+'chart':'<path d="M4 19V9m5 10V5m5 14v-8m5 8V3"/>',
+'sparkles':'<path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3ZM19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8L19 17Z"/>',
+'check':'<path d="m5 12 4 4L19 6"/>'};
+function icon(name,size=18){return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]||ICONS.file}</svg>`}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function safeLink(u){try{let v=new URL(u,location.href);return ['http:','https:'].includes(v.protocol)?v.href:'#'}catch{return '#'}}
+function inlineMd(s){let v=esc(s);v=v.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,(_,txt,url)=>`<a href="${esc(safeLink(url))}" target="_blank" rel="noopener noreferrer">${txt}</a>`);return v.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*([^*]+)\*/g,'<em>$1</em>')}
+function markdown(s){let lines=String(s||'').split(/\r?\n/),out=[],list=null,code=false,codeLines=[];const close=()=>{if(list){out.push(`</${list}>`);list=null}};for(const raw of lines){let l=raw.trim();if(l.startsWith('```')){close();if(code){out.push(`<pre><code>${esc(codeLines.join('\n'))}</code></pre>`);codeLines=[];code=false}else{code=true}continue}if(code){codeLines.push(raw);continue}if(!l){close();continue}if(/^#{2,3} /.test(l)){close();let n=l.match(/^#+/)[0].length;out.push(`<h${n}>${inlineMd(l.slice(n+1))}</h${n}>`);continue}if(/^[-*] /.test(l)||/^\d+\. /.test(l)){let t=/^[-*] /.test(l)?'ul':'ol';if(list!==t){close();out.push(`<${t}>`);list=t}out.push(`<li>${inlineMd(l.replace(/^([-*]|\d+\.)\s+/,''))}</li>`);continue}close();out.push(`<p>${inlineMd(l)}</p>`)}close();return out.join('\n')}
+const seed=JSON.parse(document.getElementById('seedData').textContent);
+const KEY='lebrief-v1';let db={custom:[],read:{},quiz:{}};
+let canSave=true;try{let raw=localStorage.getItem(KEY);if(raw){const v=JSON.parse(raw);if(v&&typeof v==='object')db={...db,...v}}}catch{canSave=false}
+function store(){try{localStorage.setItem(KEY,JSON.stringify(db));canSave=true}catch{canSave=false}}
+// Published feed is a read-only source of editions; reading status stays local.
+let published=[];
+function validEdition(a){return a&&typeof a.id==='string'&&typeof a.title==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(a.date||'')&&['fintech','cyber'].includes(a.category)&&typeof a.content==='string'&&Array.isArray(a.quiz)&&Array.isArray(a.takeaways)&&Array.isArray(a.sources)}
+let issues=()=>[...new Map([...seed,...published,...(db.custom||[])].map(a=>[a.id,a])).values()].sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+async function syncPublished(silent=false){
+  const label=document.getElementById('feedStatus');
+  if(!/^https?:$/.test(location.protocol)){if(label)label.textContent='Mode local';if(!silent)toast('Ouvre la version publiée sur le web pour synchroniser');return;}
+  if(label)label.textContent='Synchronisation…';
+  try{
+    const url=new URL('editions.json',document.baseURI);url.searchParams.set('v',Date.now().toString());
+    const response=await fetch(url.toString(),{cache:'no-store'});
+    if(!response.ok)throw new Error('HTTP '+response.status);
+    const payload=await response.json();
+    if(!payload||payload.format!=='lebrief-feed-v1'||!Array.isArray(payload.editions))throw new Error('Feed format');
+    published=payload.editions.filter(validEdition);
+    if(label)label.textContent='Flux connecté';
+    render(true);
+    if(!silent)toast(`${published.length} édition(s) synchronisée(s)`);
+  }catch(err){if(label)label.textContent='Flux indisponible';if(!silent)toast('Impossible de récupérer le flux publié');console.warn('Le Brief feed:',err.message)}
+}
+
+const getArticle=id=>issues().find(a=>a.id===id);
+const readCount=()=>issues().filter(a=>db.read[a.id]).length;
+const fdate=(s,opts={})=>new Date(s+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric',...opts});
+const miniDate=s=>new Date(s+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short',...{}});
+let searchTerm='',activeFilter='toutes',answers={...(db.quiz||{})},quizChecked=Object.fromEntries(Object.keys(db.quiz||{}).map(id=>[id,true]));let toastTimer;
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2900)}
+function pill(a){return `<span class="pill ${a.category==='cyber'?'cyber':''}">${icon(a.category==='cyber'?'shield':'credit-card',13)} ${a.category==='cyber'?'IAM & CYBER':'FINTECH'}</span>`}
+function status(a){return db.read[a.id]?`<span class="status is-read">${icon('check-circle',15)} Lu</span>`:`<span class="status">${icon('clock',15)} À lire</span>`}
+function card(a){return `<article class="issue-card"><div class="card-top">${pill(a)}<span class="date-mini">${miniDate(a.date)}</span></div><a href="#article/${encodeURIComponent(a.id)}" style="text-decoration:none"><h3>${esc(a.title)}</h3></a><p>${esc(a.summary)}</p><div class="card-footer"><span class="read-time">${icon('clock',14)} ${a.minutes||4} min · N°${String(a.number||'—').padStart(2,'0')}</span>${status(a)}</div></article>`}
+function featured(a){if(!a)return'';return `<article class="feature-card ${a.category}"><div class="card-top">${pill(a)}<span class="date-mini">${miniDate(a.date)}</span></div><h3>${esc(a.title)}</h3><p>${esc(a.summary)}</p><div class="feature-bottom"><a class="link-cta" href="#article/${encodeURIComponent(a.id)}">Lire l'édition ${icon('arrow-right',17)}</a>${status(a)}</div></article>`}
+function filtered(all){let res=all;if(activeFilter==='non-lues')res=res.filter(a=>!db.read[a.id]);if(activeFilter==='lues')res=res.filter(a=>!!db.read[a.id]);if(activeFilter==='fintech'||activeFilter==='cyber')res=res.filter(a=>a.category===activeFilter);if(searchTerm.trim()){let q=searchTerm.toLocaleLowerCase('fr');res=res.filter(a=>(a.title+' '+a.summary+' '+a.content+' '+a.category).toLocaleLowerCase('fr').includes(q))}return res}
+function renderHome(){const all=issues(),fc=all.find(a=>a.category==='fintech'),cy=all.find(a=>a.category==='cyber'),total=all.length,read=readCount(),f=filtered(all);return `<section class="hero"><div class="hero-intro"><div class="eyebrow">TA DOSE DE CURIOSITÉ, À TON RYTHME</div><h1>Quelques minutes.<br><em>Beaucoup d'idées.</em></h1><p>Un espace pour suivre les innovations fintech, approfondir l'IAM et garder une trace de tout ce que tu as appris.</p></div><div class="hero-art"><div class="art-card"><div class="art-top">TON BRIEF DU MATIN <span>✦ 05 min</span></div><div class="art-line"></div><div class="art-line"></div><div class="art-bottom"><span>Lire · Comprendre · Retenir</span><span class="art-check">${icon('check',15)}</span></div></div></div></section><section class="stats"><div class="stat"><div><strong>${total}</strong><span>Éditions disponibles</span></div><div class="stat-icon">${icon('book-open',21)}</div></div><div class="stat"><div><strong>${read}</strong><span>Éditions terminées</span></div><div class="stat-icon">${icon('check-circle',21)}</div></div><div class="stat"><div><strong>${Math.max(total-read,0)}</strong><span>Encore à découvrir</span></div><div class="stat-icon">${icon('sparkles',22)}</div></div></section><div class="section-head"><div><h2>Les dernières éditions</h2><p>Une nouveauté dans chaque domaine.</p></div></div><section class="featured">${featured(fc)}${featured(cy)}</section>${renderLibrarySection(f,'Toutes les éditions')}`}
+function renderLibrarySection(list,title){return `<section class="library-head"><div><h2>${esc(title)}</h2><div class="muted">${list.length} édition${list.length>1?'s':''} ${searchTerm?'correspondantes':''}</div></div><button class="secondary" data-open="new">${icon('plus',15)} Ajouter une édition</button></section><div class="filterbar"><button class="filter ${activeFilter==='toutes'?'selected':''}" data-filter="toutes">Toutes</button><button class="filter ${activeFilter==='fintech'?'selected':''}" data-filter="fintech">Fintech</button><button class="filter ${activeFilter==='cyber'?'selected':''}" data-filter="cyber">IAM & Cyber</button><button class="filter ${activeFilter==='non-lues'?'selected':''}" data-filter="non-lues">Non lues</button><button class="filter ${activeFilter==='lues'?'selected':''}" data-filter="lues">Lues</button></div>${list.length?`<section class="issue-grid">${list.map(card).join('')}</section>`:`<div class="empty">${icon('search',27)}<h3>Aucune édition trouvée</h3><p>Modifie tes filtres ou ta recherche pour retrouver d'autres lectures.</p><button class="secondary" data-clear="all">Effacer les filtres</button></div>`}`}
+function renderListing(view){activeFilter=view;let label={'fintech':'Fintech & Paiements','cyber':'IAM & Cybersécurité','non-lues':'À lire','lues':'Déjà lues'}[view]||'Bibliothèque';return `<div class="eyebrow">BIBLIOTHÈQUE</div><div style="margin-top:8px"><h1 style="font:800 clamp(29px,4vw,39px) Manrope;letter-spacing:-1.5px;margin:0">${label}</h1><p style="font-size:14px;color:#81928d;max-width:620px">${view==='cyber'?'Les protocoles, l’authentification et les risques expliqués simplement.':view==='fintech'?'Paiements, banques digitales et architectures financières.':'Toutes tes lectures, à ton rythme.'}</p></div>${renderLibrarySection(filtered(issues()),'Les éditions')}`}
+function renderArticle(a){let isRead=!!db.read[a.id],list=issues().filter(x=>x.category===a.category),i=list.findIndex(x=>x.id===a.id),newer=list[i-1],older=list[i+1];let qnum=(a.quiz||[]).length, qstate=answers[a.id]||{},isChecked=!!quizChecked[a.id];return `<div class="article-wrap"><a class="backlink" href="#${a.category}">${icon('arrow-left',16)} Retour à ${a.category==='fintech'?'Fintech':'IAM & Cyber'}</a><div class="article-hero ${a.category}"><div class="card-top">${pill(a)}<span class="date-mini">ÉDITION N° ${String(a.number||'—').padStart(2,'0')}</span></div><h1>${esc(a.title)}</h1><p>${esc(a.summary)}</p><div class="article-meta"><span>${icon('clock',14)} ${a.minutes||4} min de lecture</span><span>${icon('file',14)} ${fdate(a.date)}</span><span>${esc(a.tag||'Décryptage')}</span></div></div><article class="article-content">${markdown(a.content||'')}</article><section class="article-panel"><div class="panel-label ${a.category}">L'ESSENTIEL</div><h2>À retenir</h2><ol class="takeaway-list">${(a.takeaways||[]).map((t,i)=>`<li><span class="num">${i+1}</span><span>${esc(t)}</span></li>`).join('')}</ol></section>${(a.sources||[]).length?`<section class="article-panel"><div class="panel-label ${a.category}">POUR ALLER PLUS LOIN</div><h2>Ressources utilisées / repères</h2><ul class="source-list">${a.sources.map(s=>`<li><a href="${esc(safeLink(s.url))}" target="_blank" rel="noopener noreferrer">${icon('external',14)} ${esc(s.title)}</a></li>`).join('')}</ul><p style="font-size:11px;color:#85958d;margin:16px 0 0">Les articles de départ sont repris des éditions de notre conversation. Certains liens servent de documentation complémentaire.</p></section>`:''}${qnum?`<section class="article-panel" id="quizSection"><div class="panel-label ${a.category}">TESTE TES CONNAISSANCES</div><h2>Mini-quiz <span style="font-weight:600;color:#86958f;font-size:13px">· ${qnum} question${qnum>1?'s':''}</span></h2><div style="font-size:13px;color:#72817a;margin-bottom:16px">Réponds avant d'afficher le corrigé.</div>${a.quiz.map((q,qi)=>`<div class="q-block"><div class="q-number">QUESTION ${qi+1}</div><h3>${esc(q.question)}</h3>${(q.options||[]).map((op,oi)=>`<label class="quiz-choice ${isChecked&&oi===q.answer?'correct':''} ${isChecked&&qstate[qi]===oi&&oi!==q.answer?'wrong':''}"><input type="radio" name="q-${a.id}-${qi}" value="${oi}" data-q="${qi}" data-issue="${esc(a.id)}" ${qstate[qi]===oi?'checked':''} ${isChecked?'disabled':''}><span>${esc(op)}</span></label>`).join('')}${isChecked?`<div class="feedback">${qstate[qi]===q.answer?'✓ Bonne réponse.':'→ Réponse attendue : '+esc(q.options[q.answer])+'.'} ${esc(q.explanation||'')}</div>`:''}</div>`).join('')}<div class="quiz-buttons">${isChecked?`<span class="score">${a.quiz.filter((q,qi)=>qstate[qi]===q.answer).length} / ${qnum} bonne${qnum>1?'s':''} réponse${qnum>1?'s':''}</span><button class="secondary" data-retry="${esc(a.id)}">Recommencer</button>`:`<span style="font-size:12px;color:#84948b">${Object.keys(qstate).length} / ${qnum} réponse(s)</span><button class="primary ${a.category==='cyber'?'cyber':''}" data-correct="${esc(a.id)}" ${Object.keys(qstate).length<qnum?'disabled':''}>Valider mes réponses ${icon('arrow-right',15)}</button>`}</div></section>`:''}<section class="read-cta ${isRead?'is-read':''}"><div><h3>${isRead?'Édition terminée !':'Tu as terminé ta lecture ?'}</h3><p>${isRead?'Cette édition compte dans ta progression.':'Valide ta lecture pour la retrouver parmi tes éditions lues.'}</p></div><button class="primary" data-toggle-read="${esc(a.id)}">${icon(isRead?'check-circle':'check',18)} ${isRead?'Marquée comme lue · Annuler':'J’ai lu cette édition'}</button></section><nav class="adjacent">${older?`<a href="#article/${encodeURIComponent(older.id)}">${icon('arrow-left',14)} Édition précédente</a>`:'<span></span>'}${newer?`<a href="#article/${encodeURIComponent(newer.id)}">Édition suivante ${icon('arrow-right',14)}</a>`:'<span></span>'}</nav></div>`}
+function syncNav(route){document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===(route.startsWith('article/')?(getArticle(decodeURIComponent(route.slice(8)))?.category||'accueil'):route)));document.getElementById('countFin').textContent=issues().filter(a=>a.category==='fintech').length;document.getElementById('countCyb').textContent=issues().filter(a=>a.category==='cyber').length;document.getElementById('countRead').textContent=readCount();document.getElementById('countUnread').textContent=issues().length-readCount()}
+function render(keepScroll=false){let route=decodeURIComponent((location.hash||'#accueil').slice(1))||'accueil';const app=document.getElementById('app');if(route.startsWith('article/')){const id=route.slice(8),a=getArticle(id);app.innerHTML=a?renderArticle(a):`<div class="empty"><h3>Édition introuvable</h3><a href="#accueil">Revenir à l'accueil</a></div>`}else if(route==='accueil'){activeFilter='toutes';app.innerHTML=renderHome()}else{if(!['fintech','cyber','non-lues','lues'].includes(route)){route='accueil';app.innerHTML=renderHome()}else{app.innerHTML=renderListing(route)}}document.getElementById('currentDate').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});syncNav(route);if(!keepScroll)window.scrollTo({top:0,behavior:'instant'});document.getElementById('sidebar').classList.remove('open');document.getElementById('mobileOverlay').classList.remove('active')}
+function routeTo(where){if(location.hash==='#'+where){render()}else location.hash=where}
+function closeModal(){document.getElementById('modalBackdrop').classList.remove('open');document.getElementById('modalBody').innerHTML=''}
+function showModal(type){const m=document.getElementById('modalBody');let common=`<button class="icon-button" data-close="1" aria-label="Fermer">${icon('x',18)}</button>`;if(type==='new')m.innerHTML=`<div class="modal-head"><h2>Ajouter une édition</h2>${common}</div><p class="modal-sub">Colle le texte de la prochaine veille en Markdown. Elle apparaîtra dans la bonne rubrique et pourra être marquée comme lue.</p><form id="newArticleForm"><div class="form-grid"><div class="field"><label for="new-cat">Collection</label><select id="new-cat" required><option value="fintech">Fintech & Paiements</option><option value="cyber">IAM & Cyber</option></select></div><div class="field"><label for="new-date">Date</label><input id="new-date" type="date" required value="${new Date().toISOString().slice(0,10)}"></div></div><div class="field"><label for="new-title">Titre</label><input id="new-title" maxlength="180" required placeholder="Un sujet à découvrir..."></div><div class="field"><label for="new-summary">Introduction courte</label><input id="new-summary" maxlength="260" placeholder="Pourquoi ce sujet est intéressant ?"></div><div class="field"><label for="new-content">Contenu de l'édition</label><textarea id="new-content" class="long" required placeholder="## Le sujet du jour\n\nColle ici le texte...\n\n## Ce qu'il faut comprendre"></textarea><small>Markdown simple pris en charge : titres ##, **gras**, listes et blocs de code.</small></div><div class="field"><label for="new-takeaways">À retenir (une ligne par point)</label><textarea id="new-takeaways" placeholder="Premier point clé\nDeuxième point clé\nTroisième point clé"></textarea></div><div class="divider"></div><div style="font-weight:800;font-size:14px;margin-bottom:9px">Mini-quiz (facultatif)</div><div class="field"><label for="new-question">Question</label><input id="new-question" placeholder="Une question pour vérifier la compréhension"></div><div class="form-grid"><div class="field"><label for="new-o1">Choix 1</label><input id="new-o1" placeholder="Réponse A"></div><div class="field"><label for="new-o2">Choix 2</label><input id="new-o2" placeholder="Réponse B"></div></div><div class="field"><label for="new-o3">Choix 3</label><input id="new-o3" placeholder="Réponse C"></div><div class="field"><label for="new-right">Bonne réponse</label><select id="new-right"><option value="0">Choix 1</option><option value="1">Choix 2</option><option value="2">Choix 3</option></select></div><div class="modal-actions"><button class="secondary" type="button" data-close="1">Annuler</button><button class="primary" type="submit">${icon('plus',16)} Ajouter à ma bibliothèque</button></div></form>`;else m.innerHTML=`<div class="modal-head"><h2>Sauvegarde & synchronisation</h2>${common}</div><p class="modal-sub">Tes éditions ajoutées, tes lectures validées et tes résultats de quiz sont conservés dans ce navigateur.</p><div class="info-box"><strong>Important :</strong> cette version fonctionne sans compte ni serveur. Le suivi n'est pas automatiquement partagé entre tes appareils, et les nouvelles publications ChatGPT nécessitent une connexion au dépôt GitHub. Tu peux exporter/importer tes données pour les conserver ou les déplacer.</div><div style="display:grid;gap:11px;margin-top:19px"><button class="secondary" id="exportData">${icon('download',16)} Télécharger ma sauvegarde JSON</button><button class="secondary" id="importTrigger">${icon('upload',16)} Importer une sauvegarde ou des éditions JSON</button><input type="file" id="importFile" accept=".json,application/json" style="display:none"></div><div class="divider"></div><p style="font-size:13px;color:#778880"><strong>Pour publier le site :</strong> héberge le fichier <code>index.html</code> sur un hébergeur statique (Netlify, GitHub Pages...). Les données de lecture resteront propres à chaque navigateur.</p><div class="modal-actions"><button class="primary" data-close="1">Compris</button></div>`;document.getElementById('modalBackdrop').classList.add('open');let focus=m.querySelector('input,select,button');focus?.focus()}
+function addArticle(ev){ev.preventDefault();const val=id=>document.getElementById(id).value.trim();let category=val('new-cat'),date=val('new-date'),title=val('new-title'),content=val('new-content');if(!title||!content||!date){toast('Renseigne au minimum le titre, la date et le contenu.');return}let next=Math.max(0,...issues().filter(a=>a.category===category).map(a=>Number(a.number)||0))+1;const q=val('new-question'),opts=[val('new-o1'),val('new-o2'),val('new-o3')];if(q&&!opts.every(Boolean)){toast('Complète les trois choix du quiz, ou laisse la question vide.');return}const id=`custom-${Date.now()}-${Math.random().toString(36).slice(2,6)}`;let a={id,category,date,number:next,title,summary:val('new-summary')||'Nouvelle édition ajoutée à ta bibliothèque.',minutes:Math.max(2,Math.round(content.split(/\s+/).length/180)),content,takeaways:val('new-takeaways').split('\n').filter(Boolean).slice(0,6),sources:[],quiz:q?[{question:q,options:opts,answer:Number(val('new-right')),explanation:''}]:[],tag:'Nouvelle édition'};db.custom.push(a);store();closeModal();routeTo('article/'+id);toast('Édition ajoutée à ta bibliothèque')}
+function exportData(){let payload={format:'lebrief-backup-v1',exportedAt:new Date().toISOString(),editions:issues(),read:db.read,quiz:db.quiz};let blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),x=document.createElement('a');x.href=url;x.download='lebrief-sauvegarde-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(x);x.click();x.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Sauvegarde téléchargée')}
+async function importData(file){try{let data=JSON.parse(await file.text()),arr=Array.isArray(data)?data:data.editions;if(!Array.isArray(arr))throw new Error('format');let imported=arr.filter(a=>a&&typeof a.id==='string'&&typeof a.title==='string'&&typeof a.date==='string'&&typeof a.category==='string'&&['fintech','cyber'].includes(a.category)).map(a=>({...a,content:String(a.content||''),sources:Array.isArray(a.sources)?a.sources:[],quiz:Array.isArray(a.quiz)?a.quiz:[],takeaways:Array.isArray(a.takeaways)?a.takeaways:[]}));if(!imported.length)throw new Error('no articles');let seedIds=new Set(seed.map(a=>a.id)),map=new Map((db.custom||[]).map(a=>[a.id,a]));imported.filter(a=>!seedIds.has(a.id)).forEach(a=>map.set(a.id,a));db.custom=[...map.values()];if(data.read&&typeof data.read==='object')db.read={...db.read,...data.read};if(data.quiz&&typeof data.quiz==='object')db.quiz={...db.quiz,...data.quiz};store();closeModal();render();toast(`${imported.length} édition(s) reconnue(s) dans le fichier`)}catch(e){toast('Fichier JSON non reconnu : vérifie son format.')}}
+document.addEventListener('click',ev=>{const open=ev.target.closest('[data-open]');if(open){showModal(open.dataset.open);return}if(ev.target.closest('[data-close]')){closeModal();return}const filter=ev.target.closest('[data-filter]');if(filter){routeTo(filter.dataset.filter==='toutes'?'accueil':filter.dataset.filter);return}if(ev.target.closest('[data-clear]')){searchTerm='';document.getElementById('search').value='';routeTo('accueil');return}let read=ev.target.closest('[data-toggle-read]');if(read){const id=read.dataset.toggleRead;db.read[id]=!db.read[id];if(!db.read[id])delete db.read[id];store();render(true);toast(db.read[id]?'Édition marquée comme lue ✓':'Statut de lecture retiré');return}let check=ev.target.closest('[data-correct]');if(check){quizChecked[check.dataset.correct]=true;db.quiz[check.dataset.correct]=answers[check.dataset.correct];store();render(true);return}let retry=ev.target.closest('[data-retry]');if(retry){delete quizChecked[retry.dataset.retry];delete answers[retry.dataset.retry];delete db.quiz[retry.dataset.retry];store();render(true);return}if(ev.target.id==='exportData'){exportData();return}if(ev.target.id==='importTrigger'){document.getElementById('importFile').click();return}});
+document.addEventListener('change',ev=>{if(ev.target.matches('[data-q]')){const id=ev.target.dataset.issue,q=ev.target.dataset.q;answers[id]??={};answers[id][q]=Number(ev.target.value);const btn=document.querySelector('[data-correct="'+id+'"]'),a=getArticle(id);if(btn)btn.disabled=Object.keys(answers[id]).length<(a.quiz||[]).length;const ct=document.querySelector('.quiz-buttons > span');if(ct)ct.textContent=`${Object.keys(answers[id]).length} / ${(a.quiz||[]).length} réponse(s)`}if(ev.target.id==='importFile'&&ev.target.files[0])importData(ev.target.files[0])});
+document.addEventListener('submit',ev=>{if(ev.target.id==='newArticleForm')addArticle(ev)});
+document.getElementById('search').addEventListener('input',ev=>{searchTerm=ev.target.value;let route=(location.hash||'#accueil').slice(1);if(route.startsWith('article/'))routeTo('accueil');else render(true)});
+document.getElementById('mobileMenu').onclick=()=>{document.getElementById('sidebar').classList.add('open');document.getElementById('mobileOverlay').classList.add('active')};document.getElementById('mobileOverlay').onclick=()=>{document.getElementById('sidebar').classList.remove('open');document.getElementById('mobileOverlay').classList.remove('active')};document.getElementById('modalBackdrop').addEventListener('click',ev=>{if(ev.target.id==='modalBackdrop')closeModal()});window.addEventListener('keydown',ev=>{if(ev.key==='Escape')closeModal();if(ev.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){ev.preventDefault();document.getElementById('search').focus()}});
+window.addEventListener('hashchange',()=>{render()});document.querySelectorAll('[data-icon]').forEach(x=>x.innerHTML=icon(x.dataset.icon,18));document.getElementById('syncFeed').onclick=()=>syncPublished();render();syncPublished(true);if(!canSave)toast('Attention : stockage local indisponible dans ce navigateur');
+</script>
+</body>
+</html>
