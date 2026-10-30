@@ -1,6 +1,49 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": null,
-  "editions": []
+  "updatedAt": "2026-10-30T09:29:00+01:00",
+  "editions": [
+    {
+      "id": "cyber-2026-10-30",
+      "category": "cyber",
+      "date": "2026-10-30",
+      "number": 6,
+      "title": "SCIM : pourquoi le SSO ne suffit pas à gérer les comptes",
+      "summary": "Provisioning, désactivation et sessions : comprendre les limites du SSO.",
+      "tag": "Provisioning · SCIM",
+      "minutes": 4,
+      "content": "SCIM 2.0 est un protocole HTTP/JSON pour créer, modifier et désactiver des comptes dans les applications. Contrairement à SAML ou OIDC, qui servent à l'authentification, SCIM gère le cycle de vie des identités.\n\nExemple : une arrivée dans le système RH déclenche une création de compte via `POST /Users` dans une application SaaS. Au départ du collaborateur, le moteur IAM peut demander `active: false`.\n\n**Point de vigilance :** désactiver le SSO ne garantit pas que les comptes locaux ou les sessions existantes sont immédiatement révoqués. Vérifier la source de vérité, les erreurs de synchronisation et la désactivation effective.\n\n**Vocabulaire :** provisioning (création et mise à jour), deprovisioning (retrait d'accès), JML (Joiner–Mover–Leaver).",
+      "takeaways": [
+        "SSO authentifie ; SCIM gère les comptes.",
+        "Un départ exige de vérifier comptes, droits et sessions.",
+        "Tester le déprovisioning est aussi important que tester le login."
+      ],
+      "sources": [
+        {
+          "title": "RFC 7644 — SCIM Protocol",
+          "url": "https://www.rfc-editor.org/info/rfc7644/"
+        },
+        {
+          "title": "Okta Developer — Understanding SCIM",
+          "url": "https://developer.okta.com/docs/concepts/scim/"
+        },
+        {
+          "title": "Microsoft Learn — Application Provisioning",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/app-provisioning/how-provisioning-works"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Lorsqu'un salarié quitte l'entreprise, quelle affirmation est correcte ?",
+          "options": [
+            "Désactiver le SSO suffit toujours.",
+            "SCIM peut désactiver le compte, mais il faut aussi vérifier les sessions.",
+            "SCIM remplace SAML pour authentifier."
+          ],
+          "answer": 1,
+          "explanation": "SCIM gère les comptes, pas nécessairement les sessions."
+        }
+      ]
+    }
+  ]
 }
