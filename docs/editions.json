@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-10-30T09:29:00+01:00",
+  "updatedAt": "2026-11-02T10:00:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -42,6 +42,68 @@
           ],
           "answer": 1,
           "explanation": "SCIM gère les comptes, pas nécessairement les sessions."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-02",
+      "category": "fintech",
+      "date": "2026-11-02",
+      "number": 1,
+      "title": "Paiement agentique : le checkout reste chez le marchand",
+      "summary": "ACP orchestre la conversation ; le marchand garde la décision, le PSP et l’exécution du paiement.",
+      "tag": "ACP · Checkout",
+      "minutes": 4,
+      "content": "L’Agentic Commerce Protocol (ACP) est désormais documenté publiquement par OpenAI et Stripe. Mais il faut distinguer **le protocole ouvert** de la disponibilité produit : l’Instant Checkout dans ChatGPT est encore réservé à des partenaires approuvés.\\n\\nLe point architectural essentiel : ChatGPT peut initier et afficher le checkout, mais le marchand reste la source de vérité. Il crée une session (`POST /checkout_sessions`), la recalcule lorsque le panier ou la livraison change, puis confirme ou refuse la commande. Taxes, stock, fraude, capture et fulfillment restent sur sa stack.\\n\\nLe paiement ne consiste donc pas à donner un numéro de carte à l’agent. Avec les paiements délégués, un jeton à usage contrôlé est transmis au PSP du marchand : il est limité au marchand, au montant et à une durée. Le marchand applique ensuite ses contrôles habituels et conserve son rôle de merchant of record.\\n\\nPour une architecture de paiement, le vrai chantier est la fiabilité distribuée : chaque mise à jour de session doit renvoyer un état de panier complet ; les webhooks d’événements de commande doivent être signés et idempotents ; les tentatives et reprises ne doivent jamais créer une seconde commande ou une seconde capture.\\n\\n**Exemple :** l’utilisateur valide une livraison express. L’agent demande la mise à jour de session ; le marchand recalcule total, taxe et disponibilité ; l’utilisateur confirme ; le marchand autorise/capture via son PSP puis envoie l’événement de commande. L’UI conversationnelle n’est jamais l’autorité sur le prix ni l’état de paiement.\\n\\n**À surveiller :** la capacité à exposer un checkout API-first sécurisé est plus importante, à court terme, qu’un gros projet d’« agent autonome ». C’est la base réutilisable pour plusieurs canaux agents.",
+      "takeaways": [
+        "ACP n’enlève ni le PSP ni le rôle de marchand.",
+        "La session de checkout et les webhooks portent la cohérence métier.",
+        "Jetons bornés, signatures et idempotence sont des prérequis, pas des détails."
+      ],
+      "sources": [
+        {
+          "title": "OpenAI Developers — Agentic Checkout Spec",
+          "url": "https://developers.openai.com/commerce/specs/checkout"
+        },
+        {
+          "title": "OpenAI Developers — Key concepts",
+          "url": "https://developers.openai.com/commerce/guides/key-concepts"
+        },
+        {
+          "title": "Stripe — Developing an open standard for agentic commerce",
+          "url": "https://stripe.com/blog/developing-an-open-standard-for-agentic-commerce"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Qui décide finalement d’accepter ou de refuser une commande ACP ?",
+          "options": [
+            "ChatGPT",
+            "Le marchand, sur sa propre stack",
+            "Le protocole ACP"
+          ],
+          "answer": 1,
+          "explanation": "Le marchand valide la commande, le risque et le paiement."
+        },
+        {
+          "question": "À quoi sert l’idempotence du checkout ?",
+          "options": [
+            "À accélérer l’interface",
+            "À éviter une double commande ou capture lors d’une reprise",
+            "À chiffrer le catalogue"
+          ],
+          "answer": 1,
+          "explanation": "Une même requête rejouée ne doit pas produire un second effet métier."
+        },
+        {
+          "question": "Quel composant doit rester la source de vérité sur le prix et le stock ?",
+          "options": [
+            "L’interface de l’agent",
+            "Le marchand",
+            "Le navigateur de l’utilisateur"
+          ],
+          "answer": 1,
+          "explanation": "Le marchand renvoie l’état de panier autoritaire à chaque étape."
         }
       ]
     }
