@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-02T10:00:00+01:00",
+  "updatedAt": "2026-11-02T10:15:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -54,7 +54,7 @@
       "summary": "ACP orchestre la conversation ; le marchand garde la décision, le PSP et l’exécution du paiement.",
       "tag": "ACP · Checkout",
       "minutes": 4,
-      "content": "L’Agentic Commerce Protocol (ACP) est désormais documenté publiquement par OpenAI et Stripe. Mais il faut distinguer **le protocole ouvert** de la disponibilité produit : l’Instant Checkout dans ChatGPT est encore réservé à des partenaires approuvés.\\n\\nLe point architectural essentiel : ChatGPT peut initier et afficher le checkout, mais le marchand reste la source de vérité. Il crée une session (`POST /checkout_sessions`), la recalcule lorsque le panier ou la livraison change, puis confirme ou refuse la commande. Taxes, stock, fraude, capture et fulfillment restent sur sa stack.\\n\\nLe paiement ne consiste donc pas à donner un numéro de carte à l’agent. Avec les paiements délégués, un jeton à usage contrôlé est transmis au PSP du marchand : il est limité au marchand, au montant et à une durée. Le marchand applique ensuite ses contrôles habituels et conserve son rôle de merchant of record.\\n\\nPour une architecture de paiement, le vrai chantier est la fiabilité distribuée : chaque mise à jour de session doit renvoyer un état de panier complet ; les webhooks d’événements de commande doivent être signés et idempotents ; les tentatives et reprises ne doivent jamais créer une seconde commande ou une seconde capture.\\n\\n**Exemple :** l’utilisateur valide une livraison express. L’agent demande la mise à jour de session ; le marchand recalcule total, taxe et disponibilité ; l’utilisateur confirme ; le marchand autorise/capture via son PSP puis envoie l’événement de commande. L’UI conversationnelle n’est jamais l’autorité sur le prix ni l’état de paiement.\\n\\n**À surveiller :** la capacité à exposer un checkout API-first sécurisé est plus importante, à court terme, qu’un gros projet d’« agent autonome ». C’est la base réutilisable pour plusieurs canaux agents.",
+      "content": "L’Agentic Commerce Protocol (ACP) est désormais documenté publiquement par OpenAI et Stripe. Mais il faut distinguer **le protocole ouvert** de la disponibilité produit : l’Instant Checkout dans ChatGPT est encore réservé à des partenaires approuvés.\n\nLe point architectural essentiel : ChatGPT peut initier et afficher le checkout, mais le marchand reste la source de vérité. Il crée une session (`POST /checkout_sessions`), la recalcule lorsque le panier ou la livraison change, puis confirme ou refuse la commande. Taxes, stock, fraude, capture et fulfillment restent sur sa stack.\n\nLe paiement ne consiste donc pas à donner un numéro de carte à l’agent. Avec les paiements délégués, un jeton à usage contrôlé est transmis au PSP du marchand : il est limité au marchand, au montant et à une durée. Le marchand applique ensuite ses contrôles habituels et conserve son rôle de merchant of record.\n\nPour une architecture de paiement, le vrai chantier est la fiabilité distribuée : chaque mise à jour de session doit renvoyer un état de panier complet ; les webhooks d’événements de commande doivent être signés et idempotents ; les tentatives et reprises ne doivent jamais créer une seconde commande ou une seconde capture.\n\n**Exemple :** l’utilisateur valide une livraison express. L’agent demande la mise à jour de session ; le marchand recalcule total, taxe et disponibilité ; l’utilisateur confirme ; le marchand autorise/capture via son PSP puis envoie l’événement de commande. L’UI conversationnelle n’est jamais l’autorité sur le prix ni l’état de paiement.\n\n**À surveiller :** la capacité à exposer un checkout API-first sécurisé est plus importante, à court terme, qu’un gros projet d’« agent autonome ». C’est la base réutilisable pour plusieurs canaux agents.",
       "takeaways": [
         "ACP n’enlève ni le PSP ni le rôle de marchand.",
         "La session de checkout et les webhooks portent la cohérence métier.",
@@ -104,6 +104,72 @@
           ],
           "answer": 1,
           "explanation": "Le marchand renvoie l’état de panier autoritaire à chaque étape."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-02",
+      "category": "cyber",
+      "date": "2026-11-02",
+      "number": 7,
+      "title": "Passkeys : synchronisées ou liées à l’appareil ?",
+      "summary": "Le bon choix dépend moins de la technologie que du niveau de risque, de la récupération et du type de population.",
+      "tag": "FIDO2 · Passkeys",
+      "minutes": 5,
+      "content": "Une passkey FIDO2 remplace le mot de passe par une paire de clés cryptographiques : la clé privée reste sous le contrôle de l’utilisateur et le service vérifie une signature. Parce qu’elle est liée au vrai site (le *relying party*), elle est résistante au phishing classique.\\n\\nMais en entreprise, il faut distinguer deux modèles. Une **passkey liée à l’appareil** (*device-bound*) reste sur une clé de sécurité ou un appareil précis. Une **passkey synchronisée** est chiffrée puis disponible sur les appareils reliés au même fournisseur de passkeys, par exemple un gestionnaire de mots de passe. Microsoft Entra ID prend désormais en charge les deux.\\n\\nLa passkey synchronisée est très intéressante pour les collaborateurs standard : changement de téléphone plus simple, moins de tickets de récupération, inscription généralement fluide. En revanche, elle ne fournit pas d’attestation exploitable pour prouver au tenant le modèle exact de l’authenticator. Microsoft recommande donc de la traiter comme résistante au phishing, mais avec la posture d’un authenticator non attesté.\\n\\nPour les administrateurs, postes partagés, accès très sensibles ou environnements réglementés, le modèle *device-bound* reste souvent plus adapté. L’organisation peut exiger l’attestation à l’enrôlement, limiter des modèles de clés via leur AAGUID et garder un contrôle plus strict sur l’endroit où réside le secret. Son revers : prévoir un second authenticator et un parcours de récupération réaliste.\\n\\n**Approche de déploiement :** commence par un pilote ciblé. Mesure l’enrôlement réussi, les incidents de récupération, les applications incompatibles et les parcours Windows/macOS/mobile. Puis utilise une *authentication strength* dans Conditional Access pour réserver l’exigence la plus forte aux ressources sensibles.\\n\\n**À retenir :** « passkey » ne veut pas dire automatiquement « même niveau d’assurance partout ». Le choix est une politique de risque et d’expérience utilisateur.",
+      "takeaways": [
+        "Les deux types de passkeys sont résistants au phishing.",
+        "La synchronisation facilite récupération et adoption, mais ne porte pas d’attestation.",
+        "Réserver le device-bound attesté aux rôles et ressources où le contrôle matériel compte réellement."
+      ],
+      "sources": [
+        {
+          "title": "Microsoft Learn — Enable passkeys (FIDO2) in Entra ID",
+          "url": "https://learn.microsoft.com/entra/identity/authentication/how-to-authentication-synced-passkeys"
+        },
+        {
+          "title": "Microsoft Learn — Passkey (FIDO2) authentication matrix",
+          "url": "https://learn.microsoft.com/entra/identity/authentication/fido2-compatibility"
+        },
+        {
+          "title": "FIDO Alliance — High Assurance Enterprise FIDO Authentication",
+          "url": "https://fidoalliance.org/white-paper-high-assurance-enterprise-fido-authentication/"
+        },
+        {
+          "title": "NIST SP 800-63B-4 — Authentication and Authenticator Management",
+          "url": "https://csrc.nist.gov/pubs/sp/800/63/b/4/final"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Quelle différence centrale distingue une passkey synchronisée ?",
+          "options": [
+            "Elle est copiée via un fournisseur de passkeys sur les appareils autorisés",
+            "Elle ne peut fonctionner que sur une clé USB",
+            "Elle réintroduit un mot de passe"
+          ],
+          "answer": 0,
+          "explanation": "Elle est chiffrée puis synchronisée par le fournisseur de passkeys."
+        },
+        {
+          "question": "Pourquoi préférer une passkey device-bound pour un administrateur très privilégié ?",
+          "options": [
+            "Elle est toujours plus rapide",
+            "Elle permet un contrôle matériel et une attestation à l’enrôlement",
+            "Elle évite toute politique d’accès conditionnel"
+          ],
+          "answer": 1,
+          "explanation": "Ce choix renforce le contrôle sur le type et le lieu de l’authenticator."
+        },
+        {
+          "question": "Que faut-il tester lors d’un pilote passkeys ?",
+          "options": [
+            "Seulement la page de connexion",
+            "Enrôlement, récupération, compatibilité applicative et parcours multi-appareils",
+            "Seulement l’achat de clés de sécurité"
+          ],
+          "answer": 1,
+          "explanation": "L’adoption dépend autant des parcours de récupération et des applications que de la cryptographie."
         }
       ]
     }
