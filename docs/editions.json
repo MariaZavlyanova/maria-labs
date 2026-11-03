@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-02T10:15:00+01:00",
+  "updatedAt": "2026-11-03T07:49:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -170,6 +170,72 @@
           ],
           "answer": 1,
           "explanation": "L’adoption dépend autant des parcours de récupération et des applications que de la cryptographie."
+        }
+      ]
+    },
+    {
+      "id": "fintech-special-2026-11-03",
+      "category": "fintech",
+      "date": "2026-11-03",
+      "number": 2,
+      "title": "Édition spéciale — Checkout agentique : trois scénarios, un même principe",
+      "summary": "Distinguer l’assistant de marchand du checkout délégué pour construire un POC crédible et sécurisé.",
+      "tag": "Spécial · Checkout agentique",
+      "minutes": 5,
+      "content": "Un checkout agentique ne change pas le rôle fondamental du marchand : il reste responsable du prix, du stock, du risque, de la commande et de son PSP. Ce qui change est l’interface qui conduit l’achat — et, parfois, la manière de présenter une permission de paiement.\\n\\n**Scénario 1 — e-commerce classique.** Tu achètes sur un site marchand. Le site envoie la demande à son PSP, par exemple Stripe, qui passe par le réseau Mastercard/Visa vers la banque émettrice. Les données carte restent dans le coffre-fort PCI du PSP. Le marchand manipule des identifiants tels que `pm_...` (moyen de paiement sauvegardé dans *son* compte Stripe) et `pi_...` (tentative de paiement), pas le numéro de carte. Si la banque l’exige, le 3DS te demande une authentification.\\n\\n**Scénario 2 — assistant intégré au marchand.** Un chatbot SNCF compose ton panier et t’envoie vers le vrai checkout SNCF. Il n’a pas besoin de token agentique : le backend SNCF utilise, le cas échéant, le `pm_...` déjà enregistré chez SNCF pour créer un PaymentIntent. L’agent est une interface ; le paiement reste entièrement dans le périmètre marchand. C’est la meilleure V1 de POC.\\n\\n**Scénario 3 — agent tiers.** Tu délègues à un assistant personnel l’achat de billets de train pour un séminaire. Il collecte les préférences des consultants, puis crée et met à jour un panier auprès de SNCF via ACP. SNCF doit implémenter les endpoints de checkout et renvoie l’état qui fait foi : voyageurs, places, prix et conditions. Être client Stripe ne suffit pas à rendre un marchand automatiquement compatible ACP.\\n\\nAu moment où tu confirmes, une permission de paiement déléguée peut être créée : elle est liée au marchand, au montant maximal, à la devise, à la session de checkout et à une expiration. Stripe appelle cette primitive un Shared Payment Token ; ACP la décrit comme un token de paiement délégué. Ce token est distinct du `pm_...` de SNCF : il donne accès au moyen de paiement sans le révéler et sans donner à l’agent un droit général de paiement.\\n\\nLa SNCF remet ce token à son PSP, qui applique ensuite son flux normal d’autorisation/capture. Si un 3DS est nécessaire, la plateforme agentique doit te présenter le parcours bancaire ; l’agent ne contourne pas la banque. Après le paiement, Stripe notifie SNCF, puis SNCF notifie la plateforme agentique via les événements de commande ACP.\\n\\n**Contrôles non négociables côté serveur :** recalculer le total, vérifier le marchand et la session, vérifier signature et expiration, empêcher le rejeu via idempotence, journaliser la corrélation token–commande–paiement, et traiter annulation, refus et remboursement.\\n\\n**Trajectoire POC :** V1 = assistant marchand + Checkout/PaymentIntent Stripe en test + webhooks. V2 = second service « agent » et token délégué simulé, refusé s’il dépasse le montant, vise un autre marchand, expire ou est réutilisé. Ne pas présenter l’ensemble de ces flux comme universellement disponible : ACP est ouvert, mais l’Instant Checkout dans ChatGPT reste limité à des partenaires approuvés.",
+      "takeaways": [
+        "Un assistant intégré au marchand n’a pas besoin de recevoir un token de paiement.",
+        "Le token délégué est utile lorsqu’un agent tiers achète chez un marchand qui ne possède pas déjà le moyen de paiement.",
+        "Le marchand et son PSP gardent les contrôles de risque, d’autorisation et de conformité."
+      ],
+      "sources": [
+        {
+          "title": "OpenAI Developers — Agentic Checkout Spec",
+          "url": "https://developers.openai.com/commerce/specs/checkout"
+        },
+        {
+          "title": "OpenAI Developers — Agentic Commerce key concepts",
+          "url": "https://developers.openai.com/commerce/guides/key-concepts"
+        },
+        {
+          "title": "Agentic Commerce Protocol — Delegate Payment RFC",
+          "url": "https://github.com/agentic-commerce-protocol/agentic-commerce-protocol/blob/main/rfcs/rfc.delegate_payment.md"
+        },
+        {
+          "title": "Stripe — Supporting additional payment methods for agentic commerce",
+          "url": "https://stripe.com/blog/supporting-additional-payment-methods-for-agentic-commerce"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Dans quel cas un token délégué est-il le plus utile ?",
+          "options": [
+            "Un chatbot intégré au marchand utilise un moyen déjà sauvegardé chez ce marchand",
+            "Un agent tiers veut acheter chez un marchand qui ne possède pas le moyen de paiement",
+            "Un marchand veut afficher le solde d’un panier"
+          ],
+          "answer": 1,
+          "explanation": "L’agent tiers ne peut pas utiliser le `pm_...` propre au compte Stripe d’un autre marchand."
+        },
+        {
+          "question": "Que représente un `pm_...` dans l’exemple Stripe ?",
+          "options": [
+            "Une permission portable donnée à tous les agents",
+            "Un moyen de paiement référencé dans le contexte Stripe du marchand",
+            "Une preuve que le 3DS a déjà été validé"
+          ],
+          "answer": 1,
+          "explanation": "C’est l’identifiant d’un moyen de paiement dans le contexte Stripe concerné, pas un droit portable universel."
+        },
+        {
+          "question": "Quel contrôle empêche une seconde capture lors d’une reprise réseau ?",
+          "options": [
+            "La tokenisation seule",
+            "L’idempotence côté serveur",
+            "L’affichage du panier dans l’agent"
+          ],
+          "answer": 1,
+          "explanation": "Une clé d’idempotence fait qu’une même opération rejouée ne produit pas un second effet métier."
         }
       ]
     }
