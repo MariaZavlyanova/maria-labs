@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-03T07:49:00+01:00",
+  "updatedAt": "2026-11-03T10:10:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -236,6 +236,68 @@
           ],
           "answer": 1,
           "explanation": "Une clé d’idempotence fait qu’une même opération rejouée ne produit pas un second effet métier."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-03",
+      "category": "cyber",
+      "date": "2026-11-03",
+      "number": 8,
+      "title": "Accès conditionnel : pourquoi une authentification réussie ne suffit pas",
+      "summary": "Comment Entra Conditional Access combine identité, appareil et contexte, et pourquoi tester les politiques en Report-only.",
+      "tag": "IAM · Zero Trust",
+      "minutes": 4,
+      "content": "Hier, nous avons parlé des passkeys : elles permettent de vérifier fortement l'identité d'une personne. Mais une identité authentifiée doit-elle toujours obtenir l'accès à une application ? Non : c'est le rôle de l'**accès conditionnel** (*Conditional Access*).\n\n### Le principe\n\nMicrosoft Entra Conditional Access est un moteur de politiques Zero Trust. Il évalue l'utilisateur, les groupes, l'application, l'appareil, le réseau et parfois le risque. Il peut autoriser, bloquer ou exiger un contrôle supplémentaire (MFA, méthode d'authentification spécifique, appareil conforme). Ces politiques interviennent après la première étape d'authentification.\n\n### Exemple en grande entreprise (hypothétique)\n\nUne collaboratrice ouvre une application RH sensible. Depuis son ordinateur professionnel conforme, l'accès peut être autorisé ; depuis un appareil personnel non conforme, il peut être refusé, même avec une passkey valide.\n\n`SI application = RH ET appareil non conforme → BLOQUER`\n\n**Attention :** une politique qui exige MFA pour les membres de Finance ne signifie pas que les autres équipes sont interdites d'accès. L'accès conditionnel et les **habilitations applicatives** doivent être conçus séparément.\n\n### Déployer sans bloquer les utilisateurs\n\nLe mode **Report-only** permet d'évaluer une politique et de journaliser son résultat sans imposer les contrôles. Tester avec un groupe pilote, analyser les journaux de connexion, puis activer progressivement. Certains contrôles de conformité peuvent néanmoins provoquer des invites sur macOS et mobile, même en Report-only.\n\nPrévoir aussi des comptes d'accès d'urgence (*break-glass*) pour éviter de verrouiller tous les administrateurs. Dans une fédération Okta–Entra, identifier quel IdP évalue les signaux et quelles politiques s'appliquent réellement à chaque application : la configuration doit être vérifiée, sans présumer de celle de Saint-Gobain.\n\n**Vocabulaire :** *signal* (information de contexte), *grant control* (contrôle à satisfaire), *Report-only* (évaluation journalisée sans application des blocages).",
+      "takeaways": [
+        "Une authentification réussie ne garantit pas l'accès.",
+        "Accès conditionnel et habilitations sont complémentaires.",
+        "Tester en Report-only avant le déploiement."
+      ],
+      "sources": [
+        {
+          "title": "Microsoft Learn — What is Conditional Access?",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/overview"
+        },
+        {
+          "title": "Microsoft Learn — Analyze Conditional Access Policy Impact",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-report-only"
+        },
+        {
+          "title": "Microsoft Learn — Plan a Conditional Access deployment",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/plan-conditional-access"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Une passkey valide suffit-elle toujours pour accéder à une application RH ?",
+          "options": [
+            "Oui, elle contourne les politiques",
+            "Non, un appareil conforme peut aussi être exigé",
+            "Oui, si l'utilisateur est dans Entra"
+          ],
+          "answer": 1,
+          "explanation": "L'accès conditionnel évalue aussi le contexte."
+        },
+        {
+          "question": "À quoi sert Report-only ?",
+          "options": [
+            "À bloquer immédiatement",
+            "À désactiver le SSO",
+            "À évaluer une politique sans l'imposer"
+          ],
+          "answer": 2,
+          "explanation": "Les résultats sont journalisés avant l'activation."
+        },
+        {
+          "question": "Une règle MFA ciblant Finance bloque-t-elle automatiquement les autres équipes ?",
+          "options": [
+            "Non, il faut gérer séparément leurs accès",
+            "Oui, par défaut",
+            "Oui, avec FIDO2"
+          ],
+          "answer": 0,
+          "explanation": "Une politique MFA ne remplace pas les habilitations."
         }
       ]
     }
