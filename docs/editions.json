@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-05T08:56:42.905Z",
+  "updatedAt": "2026-11-05T09:00:04.283Z",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -360,6 +360,68 @@
           ],
           "answer": 2,
           "explanation": "La validité cryptographique ne remplace pas l'autorisation."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-05",
+      "category": "fintech",
+      "date": "2026-11-05",
+      "number": 3,
+      "title": "Paiement agentique : demander à un agent d'acheter n'est pas encore l'autoriser à payer",
+      "summary": "Séparer intention, consentement explicite et autorisation bancaire pour sécuriser un checkout délégué.",
+      "tag": "Agentic payments · Consentement",
+      "minutes": 4,
+      "content": "Aucune annonce majeure datée des **3 au 5 novembre 2026** n'a été confirmée dans les sources officielles consultées sur ce sujet. Aujourd'hui, une distinction essentielle pour un POC : **l'intention d'achat, le consentement et l'autorisation de paiement sont trois choses différentes.**\n\n## Ce que prévoit ACP\n\n**Fait vérifié.** Dans le parcours Agentic Commerce Protocol (ACP) d'OpenAI, l'utilisateur sélectionne son achat dans ChatGPT. Une demande de paiement délégué peut alors être créée avec un montant maximal et une expiration. Le PSP du marchand reçoit cette demande et retourne un token de paiement limité à cette opération. Le marchand conserve le traitement du paiement. Stripe propose notamment les *Shared Payment Tokens* pour ce mécanisme.\n\n**Maturité :** le protocole est documenté publiquement, mais l'Instant Checkout dans ChatGPT reste accessible aux partenaires approuvés, et non à tous les marchands.\n\n## Trois décisions à ne pas confondre\n\nImaginons un agent chargé de réserver un billet de train :\n\n1. **Intention :** « Trouve-moi un billet Paris–Lyon à moins de 120 € ». L'agent peut rechercher et comparer.\n\n2. **Consentement explicite :** « Je confirme ce billet à 84 € chez ce marchand ». L'utilisateur approuve une opération déterminée.\n\n3. **Autorisation bancaire :** le PSP et l'émetteur traitent la transaction et les éventuels contrôles SCA/3DS. Le consentement ne garantit pas l'acceptation bancaire.\n\n**Analyse d'architecture :** l'instruction initiale ne devrait jamais constituer, à elle seule, une permission générale de débiter la carte. Le consentement doit porter sur une commande précise. Si le marchand change ou si le montant passe de 84 € à 96 €, le backend doit vérifier que cette nouvelle opération reste explicitement autorisée et demander une nouvelle confirmation si nécessaire.\n\n## La brique à construire dans ton POC\n\nCrée un objet `payment_consent` côté serveur :\n\n```json\n{\n  \"merchant_id\": \"merchant_42\",\n  \"checkout_session_id\": \"cs_123\",\n  \"approved_amount\": 8400,\n  \"currency\": \"EUR\",\n  \"status\": \"APPROVED\"\n}\n```\n\nLe montant est en centimes. Ajoute en pratique l'identité du donneur d'ordre, la preuve d'approbation, l'horodatage, l'expiration et une référence à la version du panier.\n\n**Test prioritaire :** après approbation, l'agent modifie le montant ou le marchand. Le serveur doit refuser le paiement non couvert par le consentement.\n\nCe modèle est une **proposition de conception pour le POC**, pas un schéma ACP officiel.",
+      "takeaways": [
+        "Intention d'achat ≠ consentement de paiement.",
+        "Un consentement doit être précis et vérifiable.",
+        "Le PSP conserve l'autorisation bancaire."
+      ],
+      "sources": [
+        {
+          "title": "OpenAI — Agentic Commerce, Key concepts",
+          "url": "https://developers.openai.com/commerce/guides/key-concepts"
+        },
+        {
+          "title": "OpenAI — Delegated Payment Spec",
+          "url": "https://developers.openai.com/commerce/specs/payment"
+        },
+        {
+          "title": "Stripe — Agentic Commerce",
+          "url": "https://docs.stripe.com/agentic-commerce"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "« Trouve-moi un billet à moins de 120 € » autorise-t-il automatiquement le paiement ?",
+          "options": [
+            "Oui",
+            "Non",
+            "Seulement avec Stripe"
+          ],
+          "answer": 1,
+          "explanation": "La recherche ne vaut pas consentement à débiter."
+        },
+        {
+          "question": "Qui autorise techniquement la transaction bancaire ?",
+          "options": [
+            "Le LLM",
+            "Le protocole ACP",
+            "Le PSP et la chaîne bancaire"
+          ],
+          "answer": 2,
+          "explanation": "Le consentement ne remplace pas l'autorisation bancaire."
+        },
+        {
+          "question": "Que faire si le marchand change après confirmation ?",
+          "options": [
+            "Revalider le consentement",
+            "Payer quand même",
+            "Modifier le token côté agent"
+          ],
+          "answer": 0,
+          "explanation": "Le paiement doit rester dans le périmètre approuvé."
         }
       ]
     }
