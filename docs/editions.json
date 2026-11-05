@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-03T10:05:00+01:00",
+  "updatedAt": "2026-11-05T08:56:42.905Z",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -298,6 +298,68 @@
           ],
           "answer": 0,
           "explanation": "Une politique MFA ne remplace pas les habilitations."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-05",
+      "category": "cyber",
+      "date": "2026-11-05",
+      "number": 9,
+      "title": "OIDC : pourquoi un ID token ne doit jamais remplacer un access token",
+      "summary": "Distinguer preuve d'authentification et droit d'appeler une API, avec les contrôles de validation indispensables.",
+      "tag": "OIDC · OAuth 2.0 · Tokens",
+      "minutes": 4,
+      "content": "Après les passkeys et l'accès conditionnel, une question se pose : **une fois l'utilisateur authentifié, comment une application sait-elle qui il est et quelles API il peut appeler ?** C'est ici qu'interviennent OpenID Connect (OIDC) et OAuth 2.0.\n\n## Deux tokens, deux responsabilités\n\nOIDC ajoute une couche d'identité à OAuth 2.0. Dans un parcours OIDC, une application peut recevoir deux tokens de finalités différentes :\n\n- **ID token :** preuve d'authentification destinée à l'application cliente. Il est au format JWT. Il ne doit pas servir à appeler une API.\n\n- **Access token :** jeton d'accès destiné à une ressource protégée, comme une API. Il peut être un JWT ou avoir un autre format ; le client doit le traiter comme une valeur opaque.\n\nUn ID token répond essentiellement à « qui s'est authentifié pour ce client ? » ; un access token permet à une API de vérifier si la requête dispose de l'autorisation nécessaire.\n\n## Exemple hypothétique en grande entreprise\n\nUne collaboratrice ouvre une application interne de demandes de congés utilisant Microsoft Entra ID. Elle s'authentifie ; l'application reçoit un ID token pour établir son identité. Quand elle consulte son solde, l'application présente un **access token destiné à l'API des congés**. L'API vérifie le token et les permissions avant de répondre.\n\nSi le token est un JWT, l'API valide notamment la signature, l'émetteur (`iss`), le destinataire (`aud`), l'expiration (`exp`) et les permissions applicables. Les détails dépendent de l'émetteur et du type de token.\n\n## Le piège de sécurité\n\nImaginons une API qui accepte n'importe quel JWT correctement signé par Entra ID. Un développeur pourrait lui transmettre un ID token destiné à une autre application : la signature serait valide, **mais ce token ne serait pas destiné à l'API**. La validation de `aud` permet d'éviter cette confusion.\n\nAutre nuance : un access token valide n'accorde pas automatiquement tous les droits. L'API doit encore contrôler les scopes, les rôles et, si nécessaire, les règles métier.\n\n**Question d'architecture :** lors d'une revue d'intégration OIDC, quels tokens sont utilisés, par qui et comment sont-ils validés ?\n\n**Vocabulaire :** `iss` (*issuer*, émetteur), `aud` (*audience*, destinataire), `exp` (expiration).",
+      "takeaways": [
+        "ID token : preuve d'authentification pour le client.",
+        "Access token : jeton d'accès à une API.",
+        "Signature valide ne signifie pas autorisation suffisante."
+      ],
+      "sources": [
+        {
+          "title": "OpenID Foundation — OpenID Connect Core 1.0",
+          "url": "https://openid.net/specs/openid-connect-core-1_0.html"
+        },
+        {
+          "title": "Microsoft Learn — ID tokens",
+          "url": "https://learn.microsoft.com/en-us/entra/identity-platform/id-tokens"
+        },
+        {
+          "title": "Microsoft Learn — Access tokens",
+          "url": "https://learn.microsoft.com/en-us/entra/identity-platform/access-tokens"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Quel token une application doit-elle présenter à une API protégée ?",
+          "options": [
+            "ID token",
+            "Access token",
+            "Refresh token"
+          ],
+          "answer": 1,
+          "explanation": "L'access token est destiné à l'API."
+        },
+        {
+          "question": "Que vérifie principalement le claim aud ?",
+          "options": [
+            "Le destinataire du token",
+            "L'adresse IP",
+            "La méthode MFA"
+          ],
+          "answer": 0,
+          "explanation": "Il permet de vérifier que le token a été émis pour le bon destinataire."
+        },
+        {
+          "question": "Une signature JWT valide suffit-elle pour autoriser une opération ?",
+          "options": [
+            "Oui, toujours",
+            "Oui, si le token est récent",
+            "Non, il faut vérifier la destination et les permissions"
+          ],
+          "answer": 2,
+          "explanation": "La validité cryptographique ne remplace pas l'autorisation."
         }
       ]
     }
