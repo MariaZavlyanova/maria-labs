@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-05T09:00:04.283Z",
+  "updatedAt": "2026-11-06T09:07:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -422,6 +422,68 @@
           ],
           "answer": 0,
           "explanation": "Le paiement doit rester dans le périmètre approuvé."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-06",
+      "category": "fintech",
+      "date": "2026-11-06",
+      "number": 4,
+      "title": "Stripe × Samsung Wallet : les stablecoins entrent dans le paiement grand public",
+      "summary": "Crypto Onramp permet l'achat d'USDC depuis Samsung Wallet aux États-Unis ; une leçon de réconciliation pour le POC.",
+      "tag": "Stablecoins · Wallets · Stripe",
+      "minutes": 4,
+      "content": "**Fait vérifié — 5 novembre 2026.** Stripe annonce que son infrastructure Crypto Onramp alimente le nouveau compte stablecoin de Samsung Wallet aux États-Unis. Les utilisateurs éligibles peuvent acheter de l'USDC, un stablecoin indexé sur le dollar, avec Samsung Pay, une carte bancaire ou un virement ACH. Stripe prend en charge la vérification d'identité, la conformité et la prévention de la fraude.\n\n**Maturité :** disponibilité annoncée pour les utilisateurs éligibles aux États-Unis, sur un parc potentiel de 82 millions d'appareils Galaxy. Cela ne signifie pas 82 millions d'utilisateurs actifs. Aucune disponibilité française n'est annoncée.\n\nUn *crypto onramp* est une passerelle entre moyens de paiement traditionnels et cryptoactifs. Le flux simplifié est : utilisateur Samsung Wallet → Stripe Crypto Onramp (KYC, conformité, antifraude) → paiement fiat → acquisition d'USDC. Le wallet peut déléguer certaines fonctions à une infrastructure spécialisée.\n\n**Analyse d'architecture :** le wallet doit néanmoins gérer les statuts, les échecs, les remboursements éventuels et la réconciliation entre montant payé et USDC reçu. Le paiement fiat confirmé ne prouve pas à lui seul la livraison de l'actif.\n\n**Lien avec le POC agentique (hypothèse de conception, pas une fonctionnalité Samsung) :** un agent est autorisé à acquérir 50 USDC avec un plafond de 52 USD. Avant d'initier l'opération, le serveur vérifie le consentement, le plafond, la devise, l'expiration et le taux appliqué. Il journalise séparément la transaction fiat et la livraison des USDC. Cette séparation entre intention, exécution et règlement est aussi utile pour sécuriser un checkout agentique. L'annonce Samsung ne porte pas directement sur ACP ni sur les Shared Payment Tokens.",
+      "takeaways": [
+        "Stripe fournit l'onramp stablecoin de Samsung Wallet.",
+        "Déploiement annoncé aux États-Unis, pas en France.",
+        "Paiement fiat et livraison crypto sont deux états à réconcilier."
+      ],
+      "sources": [
+        {
+          "title": "Stripe — Samsung Wallet et stablecoins, 5 novembre 2026",
+          "url": "https://stripe.com/newsroom/news/stripe-powers-stablecoin-purchases-in-samsung-wallet"
+        },
+        {
+          "title": "Stripe — Newsroom officielle",
+          "url": "https://stripe.com/newsroom/news"
+        },
+        {
+          "title": "Stripe Docs — Shared Payment Tokens (contexte POC)",
+          "url": "https://docs.stripe.com/agentic-commerce/concepts/shared-payment-tokens.md?agent-seller=seller"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Quel est le rôle de Stripe Crypto Onramp ?",
+          "options": [
+            "Créer un protocole ACP",
+            "Faciliter l'achat de cryptoactifs avec des moyens de paiement classiques",
+            "Remplacer les banques émettrices"
+          ],
+          "answer": 1,
+          "explanation": "L'onramp relie les paiements traditionnels à l'acquisition de cryptoactifs."
+        },
+        {
+          "question": "Où le nouveau compte stablecoin est-il annoncé disponible ?",
+          "options": [
+            "Dans toute l'Europe",
+            "En France uniquement",
+            "Aux États-Unis pour les utilisateurs éligibles"
+          ],
+          "answer": 2,
+          "explanation": "L'annonce concerne les États-Unis."
+        },
+        {
+          "question": "Quel contrôle est essentiel pour un POC d'achat d'USDC ?",
+          "options": [
+            "Réconcilier paiement et livraison des USDC",
+            "Considérer le paiement comme une livraison immédiate",
+            "Ignorer le taux de conversion"
+          ],
+          "answer": 0,
+          "explanation": "L'encaissement et la livraison doivent être suivis séparément."
         }
       ]
     }
