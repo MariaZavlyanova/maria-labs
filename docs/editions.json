@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-06T09:07:00+01:00",
+  "updatedAt": "2026-11-06T08:23:18.208Z",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -484,6 +484,64 @@
           ],
           "answer": 0,
           "explanation": "L'encaissement et la livraison doivent être suivis séparément."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-06",
+      "category": "cyber",
+      "date": "2026-11-06",
+      "number": 10,
+      "title": "Refresh token : rester connecté sans se réauthentifier à chaque appel API",
+      "summary": "Après ID token et access token, comprendre comment une application renouvelle ses accès et pourquoi le refresh token est sensible.",
+      "tag": "OIDC · OAuth 2.0 · Sessions",
+      "minutes": 4,
+      "content": "Hier, nous avons distingué **ID token** (preuve d'authentification pour l'application) et **access token** (accès à une API). Mais si l'access token expire alors que l'utilisateur travaille encore, doit-il refaire son MFA ? Pas nécessairement : c'est l'un des rôles du **refresh token**.\n\n## Le mécanisme\n\nUn refresh token est un secret remis à un client OAuth autorisé pour obtenir de nouveaux access tokens sans redemander immédiatement une authentification interactive. Il est destiné au **serveur d'autorisation** (par exemple Microsoft Entra ID), **jamais à l'API métier**.\n\n**Cinématique simplifiée :**\n\n```text\nUtilisateur → Application : ouverture de session\nApplication ↔ Entra ID : authentification + échange du code\nEntra ID → Application : access token (+ refresh token, selon le flux)\nApplication → API : access token\nAPI → Application : données\n... access token expiré ...\nApplication → Entra ID : refresh token\nEntra ID → Application : nouvel access token\nApplication → API : nouvel access token\n```\n\nL'application peut ainsi poursuivre une session sans imposer une reconnexion à chaque expiration. **Attention :** un refresh token n'est pas systématiquement émis ; cela dépend du flux, du client et des permissions demandées.\n\n## Exemple d'entreprise\n\nImaginons une application RH intégrée à Entra ID. Une collaboratrice se connecte le matin, puis consulte des informations l'après-midi. L'access token utilisé pour appeler l'API RH a expiré. Si le client détient un refresh token encore valable, il demande un nouveau jeton à Entra ID ; l'utilisateur peut ne rien remarquer.\n\nLe fournisseur d'identité peut toutefois exiger une réauthentification, notamment si le refresh token est expiré ou révoqué, ou si une politique impose une nouvelle interaction.\n\n## Le risque : un secret à longue portée\n\nUn refresh token volé peut permettre à un attaquant d'obtenir de nouveaux access tokens. Il est donc particulièrement sensible : stockage protégé, accès limité, suppression après usage et gestion des révocations sont indispensables.\n\n**Nuance Microsoft importante :** Entra ID peut délivrer un nouveau refresh token lors d'un renouvellement, mais **l'ancien n'est pas automatiquement révoqué par ce seul usage**. Il faut le supprimer côté client ; ne pas confondre renouvellement et invalidation immédiate de tous les jetons précédents.\n\n**Autre distinction :** une session web maintenue par cookie et un refresh token OAuth sont deux mécanismes différents. Le cookie identifie une session auprès de l'application ; le refresh token sert à demander de nouveaux jetons à l'IdP.\n\n**Question d'architecture :** dans chaque application, où sont conservés les refresh tokens, qui peut les lire, et comment se comporte-t-elle après révocation ou expiration ?\n\n**Trois termes :** *refresh token* (renouvellement), *token rotation* (émission d'un nouveau jeton), *revocation* (invalidation).",
+      "takeaways": [
+        "ID token : authentifier ; access token : appeler l'API ; refresh token : renouveler l'accès.",
+        "Le refresh token est envoyé à l'IdP, jamais à l'API métier.",
+        "Protéger, supprimer et gérer la révocation des refresh tokens."
+      ],
+      "sources": [
+        {
+          "title": "Microsoft Learn — Refresh tokens in the Microsoft identity platform",
+          "url": "https://learn.microsoft.com/en-us/entra/identity-platform/refresh-tokens"
+        },
+        {
+          "title": "OWASP — Session Management Cheat Sheet",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "À qui présente-t-on un refresh token ?",
+          "options": [
+            "À l'API RH",
+            "Au serveur d'autorisation",
+            "Au navigateur de l'utilisateur"
+          ],
+          "answer": 1,
+          "explanation": "Le refresh token est échangé auprès de l'IdP contre un nouvel access token."
+        },
+        {
+          "question": "Pourquoi un refresh token volé est-il sensible ?",
+          "options": [
+            "Il permet potentiellement d'obtenir de nouveaux access tokens",
+            "Il change le mot de passe de l'utilisateur",
+            "Il remplace automatiquement le MFA"
+          ],
+          "answer": 0,
+          "explanation": "Tant qu'il est valable, il peut prolonger l'accès sans interaction de l'utilisateur."
+        },
+        {
+          "question": "Dans Entra ID, utiliser un refresh token révoque-t-il automatiquement l'ancien ?",
+          "options": [
+            "Oui, toujours",
+            "Seulement si l'API le demande",
+            "Non, pas du seul fait de son utilisation"
+          ],
+          "answer": 2,
+          "explanation": "Microsoft recommande de supprimer l'ancien token côté client."
         }
       ]
     }
