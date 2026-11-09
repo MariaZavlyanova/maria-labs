@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-06T08:23:18.208Z",
+  "updatedAt": "2026-11-09T08:44:44.135Z",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -542,6 +542,68 @@
           ],
           "answer": 2,
           "explanation": "Microsoft recommande de supprimer l'ancien token côté client."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-09",
+      "category": "cyber",
+      "date": "2026-11-09",
+      "number": 11,
+      "title": "PKCE : pourquoi le code OAuth volé ne doit pas suffire",
+      "summary": "Comprendre comment PKCE lie un code d’autorisation à l’application qui a initié la connexion.",
+      "tag": "OAuth 2.0 · PKCE",
+      "minutes": 4,
+      "content": "Après les **ID tokens**, **access tokens** et **refresh tokens**, examinons l'étape qui précède leur émission : le **code d'autorisation OAuth 2.0**. Comment éviter qu'un attaquant qui intercepte ce code l'échange contre des tokens ? La réponse s'appelle **PKCE**, prononcé « pixy » (*Proof Key for Code Exchange*).\n\n## Le problème : un code intercepté\n\nDans le flux *Authorization Code*, l'application redirige l'utilisateur vers l'IdP (Entra ID ou Okta). Après authentification, l'IdP renvoie un **code temporaire** à l'application, qui l'échange auprès du point d'accès `/token` contre des tokens. Ce code n'est **ni** un ID token **ni** un access token : c'est un justificatif intermédiaire, à usage unique.\n\nSans protection adaptée, un attaquant qui récupère ce code pourrait tenter de l'échanger avant l'application légitime. Le risque est particulièrement important pour les applications mobiles ou les clients publics qui ne peuvent pas conserver un secret client de manière sûre.\n\n## Comment PKCE change la cinématique\n\nAvant toute redirection, l'application génère une valeur aléatoire secrète : le `code_verifier`. Elle calcule ensuite `code_challenge = BASE64URL(SHA256(code_verifier))` (méthode **S256**).\n\n```text\nApplication              IdP\n  |-- /authorize + code_challenge -->|\n  |<------ code d'autorisation ------|\n  |-- /token + code + code_verifier ->|\n  |<---- ID token / access token ----|\n```\n\nL'IdP mémorise le *challenge* associé au code. Lors de l'échange, il recalcule le challenge à partir du *verifier* reçu. **Si les valeurs ne correspondent pas, il refuse de délivrer les tokens.** Un code intercepté seul ne suffit donc plus.\n\n## Exemple en grande entreprise\n\nUne application RH interne utilise Entra ID pour connecter ses salariés. Lorsqu'une collaboratrice s'authentifie, l'application crée un nouveau `code_verifier` pour cette tentative, transmet uniquement son empreinte à Entra ID, puis présente le verifier au moment d'échanger le code. Le mécanisme protège cet échange ; il ne remplace ni le MFA, ni la validation des tokens, ni les contrôles d'autorisation de l'API RH.\n\n**Point de vigilance architecturale :** ne réutilise pas un `code_verifier` constant, utilise **S256**, conserve le verifier de façon sûre pendant la transaction et vérifie également le paramètre `state` pour prévenir les attaques de confusion de réponse/CSRF. Microsoft exige PKCE pour les applications monopages (SPA) utilisant ce flux et le recommande plus largement.\n\n**Trois termes :** `code_verifier` (secret aléatoire local), `code_challenge` (empreinte transmise à l'IdP), `S256` (méthode de transformation SHA-256).",
+      "takeaways": [
+        "Le code OAuth est temporaire : ce n'est pas un token d'API.",
+        "PKCE lie l'échange du code à un secret créé par le client.",
+        "S256 et un verifier unique sont essentiels."
+      ],
+      "sources": [
+        {
+          "title": "IETF — RFC 7636 : Proof Key for Code Exchange",
+          "url": "https://datatracker.ietf.org/doc/html/rfc7636"
+        },
+        {
+          "title": "Microsoft Learn — Flux de code d'autorisation OAuth et PKCE",
+          "url": "https://learn.microsoft.com/fr-fr/entra/identity-platform/v2-oauth2-auth-code-flow"
+        },
+        {
+          "title": "IETF — RFC 9700 : OAuth 2.0 Security Best Current Practice",
+          "url": "https://datatracker.ietf.org/doc/html/rfc9700"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "À quoi sert principalement PKCE ?",
+          "options": [
+            "Chiffrer l'ID token",
+            "Empêcher l'échange d'un code intercepté sans preuve",
+            "Accorder des rôles à l'API"
+          ],
+          "answer": 1,
+          "explanation": "Le code_verifier lie la demande de tokens à la transaction initiale."
+        },
+        {
+          "question": "Quelle valeur est envoyée lors de la première redirection vers l'IdP ?",
+          "options": [
+            "Le code_challenge",
+            "Le code_verifier",
+            "Le refresh token"
+          ],
+          "answer": 0,
+          "explanation": "Le verifier reste secret jusqu'à l'échange du code."
+        },
+        {
+          "question": "PKCE remplace-t-il le MFA et les contrôles d'autorisation ?",
+          "options": [
+            "Oui",
+            "Seulement sur mobile",
+            "Non"
+          ],
+          "answer": 2,
+          "explanation": "PKCE protège l'échange du code, pas l'ensemble de la sécurité IAM."
         }
       ]
     }
