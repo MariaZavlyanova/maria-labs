@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-09T08:44:44.135Z",
+  "updatedAt": "2026-11-10T09:49:57+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -604,6 +604,64 @@
           ],
           "answer": 2,
           "explanation": "PKCE protège l'échange du code, pas l'ensemble de la sécurité IAM."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-10",
+      "category": "cyber",
+      "date": "2026-11-10",
+      "number": 12,
+      "title": "CAE : comment couper un accès avant l’expiration du token",
+      "summary": "Une session peut être interrompue après un événement de sécurité, même si l’access token n’a pas expiré.",
+      "tag": "Sessions · Microsoft Entra · CAE",
+      "minutes": 4,
+      "content": "Hier, nous avons vu comment PKCE sécurise l'obtention des tokens. Aujourd'hui, intéressons-nous à leur **durée de validité** : si un collaborateur quitte l'entreprise à 10 h, son access token déjà délivré peut-il rester utilisable ?\n\n## Le problème : un token encore valide\n\nDans un modèle classique, une API valide la signature, l'audience, les permissions et l'expiration (`exp`) d'un access token. Même si le compte est désactivé dans l'annuaire, un token déjà émis peut rester accepté jusqu'à son expiration, sauf mécanisme de révocation ou vérification complémentaire.\n\n**Continuous Access Evaluation (CAE)** réduit ce délai pour les applications et ressources compatibles : Microsoft Entra communique certains événements critiques aux services concernés, qui peuvent refuser un token **avant son expiration**.\n\n## Cinématique simplifiée\n\n1. À 9 h, Alice se connecte à une application Microsoft 365 compatible et reçoit un access token.\n\n2. À 10 h, son compte est désactivé dans Entra ID.\n\n3. Entra transmet l'événement critique au service compatible, par exemple Exchange Online.\n\n4. Lors de l'appel suivant, le service refuse le token pourtant non expiré. Un client compatible peut recevoir une réponse `401` avec un **claims challenge** et tenter une nouvelle authentification, qui sera refusée si le compte est désactivé.\n\n**Ce n'est pas un contrôle continu à chaque milliseconde :** Microsoft vise une réaction proche du temps réel, mais indique qu'une propagation pouvant atteindre environ 15 minutes est possible pour certains événements.\n\n## Exemple d'architecture d'entreprise\n\nUne entreprise utilise Entra ID et Microsoft 365. L'équipe IAM désactive un compte à la sortie d'un salarié. CAE contribue à réduire la fenêtre pendant laquelle ses sessions existantes peuvent encore accéder aux ressources compatibles.\n\n**Attention aux limites :** CAE n'est pas automatiquement disponible pour toutes les applications métier. Le support dépend du couple client–ressource ; certaines modifications de groupes ou de politiques peuvent prendre beaucoup plus longtemps. Une API maison qui valide simplement des JWT hors ligne ne bénéficie pas automatiquement de cette mécanique.\n\n## Le réflexe de l'architecte\n\nPour une application sensible, demande : **« Que se passe-t-il si le compte est désactivé alors que le token n'a pas expiré ? »** Vérifie les capacités de révocation, la compatibilité CAE, les délais effectifs et le comportement du client face à un `401`.\n\n**Termes à retenir :** `CAE` (évaluation continue de l'accès), `claims challenge` (demande de nouvelles preuves/conditions), `revocation` (invalidation d'accès).",
+      "takeaways": [
+        "Un token non expiré peut devenir inutilisable avant `exp`.",
+        "CAE accélère la prise en compte de certains événements de sécurité.",
+        "La protection dépend des clients et ressources compatibles."
+      ],
+      "sources": [
+        {
+          "title": "Microsoft Learn — Continuous access evaluation",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-continuous-access-evaluation"
+        },
+        {
+          "title": "Microsoft Learn — Token Protection in Microsoft Entra Conditional Access",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-token-protection"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Avec CAE, un service compatible peut-il rejeter un access token non expiré ?",
+          "options": [
+            "Oui, après certains événements ou changements de politique",
+            "Non, jamais avant exp",
+            "Seulement si le JWT est mal signé"
+          ],
+          "answer": 0,
+          "explanation": "CAE permet de refuser certains tokens avant leur expiration."
+        },
+        {
+          "question": "Quel événement peut déclencher une réévaluation critique ?",
+          "options": [
+            "Le changement de couleur de l'interface",
+            "La désactivation du compte utilisateur",
+            "L'ouverture d'un nouvel onglet"
+          ],
+          "answer": 1,
+          "explanation": "La désactivation d'un compte fait partie des événements critiques pris en charge."
+        },
+        {
+          "question": "CAE fonctionne-t-il automatiquement avec toute API qui accepte des JWT ?",
+          "options": [
+            "Oui",
+            "Oui, avec un refresh token",
+            "Non, la compatibilité du service et du client compte"
+          ],
+          "answer": 2,
+          "explanation": "Une API qui valide simplement un JWT hors ligne n'intègre pas automatiquement CAE."
         }
       ]
     }
