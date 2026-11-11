@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-10T09:49:57+01:00",
+  "updatedAt": "2026-11-11T09:00:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -662,6 +662,72 @@
           ],
           "answer": 2,
           "explanation": "Une API qui valide simplement un JWT hors ligne n'intègre pas automatiquement CAE."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-11",
+      "category": "fintech",
+      "date": "2026-11-11",
+      "number": 5,
+      "title": "Paiement agentique : figer le checkout avant de déléguer le paiement",
+      "summary": "Le mandat ou token doit être lié à un panier calculé par le marchand, pas à l’intention vague exprimée à l’assistant.",
+      "tag": "ACP · AP2 · Intégrité du checkout",
+      "minutes": 4,
+      "content": "L’agent peut dire « réserve les billets Paris–Lyon pour dix consultants », mais cette phrase ne suffit jamais à autoriser un paiement. Entre l’intention et l’autorisation, le marchand doit produire un **checkout déterministe** : voyageurs, trajet, tarif, taxes, frais, devise, conditions d’échange et total final.\n\nDans ACP, ChatGPT crée ou met à jour une session auprès du marchand. Le marchand recalcule ensuite prix, stock, taxe et risque sur sa propre stack ; c’est lui qui décide si la session est *ready_for_payment*. Les appels ACP sont protégés par HTTPS et incluent notamment une clé d’idempotence, un identifiant de requête, une signature et un horodatage. Cela protège l’intégrité du message et limite le rejeu ; cela ne transforme pas l’agent en autorité sur le prix.\n\nLa délégation intervient **après** cette détermination. OpenAI décrit un paiement délégué où la demande est bornée par un montant maximal et une expiration ; le PSP émet un token de paiement que l’agent transmet au marchand. Avec Stripe, le *Shared Payment Token* évite d’exposer les données carte à l’agent. Le token n’est donc pas un « droit de payer partout » : le marchand et son PSP doivent vérifier qu’il correspond à la session, au montant et au contexte attendus.\n\nAP2 pousse cette idée plus loin : le marchand signe l’état du checkout et le mandat de paiement est cryptographiquement lié à ce checkout. L’intérêt est très concret : si le prix passe de 1 200 € à 1 350 €, si le trajet change, ou si un billet est remplacé, le hash du checkout ne correspond plus. Il faut revenir à une nouvelle confirmation, pas réutiliser l’ancienne autorisation.\n\n**Cinématique**\n\n`Assistant → Marchand` : crée le panier et récupère le checkout calculé.  \n`Marchand → Assistant` : renvoie la session, le total, l’expiration et, avec AP2, une preuve signée de cet état.  \n`Assistant → Utilisateur` : affiche le récapitulatif et obtient son approbation explicite.  \n`Assistant → PSP/wallet → Marchand` : transmet une autorisation/token borné ; aucune donnée carte brute ne passe par l’agent.  \n`PSP → réseau/banque → Marchand` : autorisation, puis webhook signé vers la commande.\n\n**Geste POC du jour :** ajoute un objet serveur `checkout_snapshot` à ta commande : `session_id`, `amount_minor`, `currency`, `items_hash`, `expires_at`, `version`. Au endpoint `POST /orders/{id}/pay`, recalcule le panier, compare ces champs au snapshot approuvé et refuse avec `409 checkout_changed` en cas d’écart. Conserve la même clé d’idempotence pour toute reprise réseau ; crée le PaymentIntent Stripe seulement après cette validation.",
+      "takeaways": [
+        "L’intention formulée à l’agent n’est pas une autorisation de paiement.",
+        "Le marchand recalcule et fige le checkout ; le token de paiement est borné et ne révèle pas la carte.",
+        "Tout changement de panier, prix ou trajet doit invalider l’autorisation et déclencher une nouvelle confirmation."
+      ],
+      "sources": [
+        {
+          "title": "OpenAI Developers — Agentic Checkout Spec",
+          "url": "https://developers.openai.com/commerce/specs/checkout"
+        },
+        {
+          "title": "OpenAI Developers — Agentic Commerce key concepts",
+          "url": "https://developers.openai.com/commerce/guides/key-concepts"
+        },
+        {
+          "title": "AP2 — Agentic Payment Protocol v0.2",
+          "url": "https://ap2-protocol.org/ap2/specification/"
+        },
+        {
+          "title": "Stripe — Supporting additional payment methods for agentic commerce (3 mars 2026)",
+          "url": "https://stripe.com/blog/supporting-additional-payment-methods-for-agentic-commerce"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Pourquoi le marchand doit-il recalculer le checkout juste avant paiement ?",
+          "options": [
+            "Pour laisser l’agent choisir le prix",
+            "Pour vérifier que total, stock, taxes et trajet correspondent encore à l’autorisation",
+            "Pour transmettre le numéro de carte au réseau"
+          ],
+          "answer": 1,
+          "explanation": "Le marchand demeure la source de vérité ; une autorisation doit viser son état de checkout final."
+        },
+        {
+          "question": "Que protège principalement la liaison AP2 entre mandat de paiement et checkout ?",
+          "options": [
+            "Contre une modification du panier ou du montant après consentement",
+            "Contre toute fraude bancaire",
+            "Contre l’expiration d’un token OAuth"
+          ],
+          "answer": 0,
+          "explanation": "Le mandat est rattaché cryptographiquement au checkout approuvé, ce qui rend visible une dérive de panier."
+        },
+        {
+          "question": "Que doit faire le POC si le prix du billet change après l’approbation ?",
+          "options": [
+            "Réutiliser le token et capturer le nouveau montant",
+            "Créer une nouvelle confirmation pour le nouveau checkout",
+            "Ignorer la différence si elle est faible"
+          ],
+          "answer": 1,
+          "explanation": "Une variation d’état ou de montant invalide l’autorisation précédente."
         }
       ]
     }
