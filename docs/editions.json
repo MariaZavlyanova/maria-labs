@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-11T09:00:00+01:00",
+  "updatedAt": "2026-11-11T08:34:12.907Z",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -728,6 +728,68 @@
           ],
           "answer": 1,
           "explanation": "Une variation d’état ou de montant invalide l’autorisation précédente."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-11",
+      "category": "cyber",
+      "date": "2026-11-11",
+      "number": 13,
+      "title": "Identités de workload : quand une application s'authentifie sans utilisateur",
+      "summary": "Comprendre service principal et managed identity dans Entra ID, et pourquoi supprimer les secrets ne suffit pas à sécuriser une application.",
+      "tag": "Entra ID · Identités non humaines",
+      "minutes": 4,
+      "content": "Après les tokens et leur révocation, changeons de perspective : **que se passe-t-il lorsqu'une application doit appeler une autre application, sans utilisateur connecté ?** C'est le domaine des *workload identities*, ou identités de charges de travail.\n\n## Le problème : les machines aussi ont besoin d'une identité\n\nImaginons une application RH exécutée chaque nuit qui lit des données dans un stockage Azure. Elle doit prouver son identité au service cible. Utiliser le compte personnel d'un administrateur serait dangereux : départ du salarié, privilèges excessifs et traçabilité confuse.\n\nDans Microsoft Entra ID, trois notions sont liées : **app registration** (définition d'une application), **service principal** (son identité dans un tenant) et **managed identity** (type particulier de service principal dont les identifiants techniques sont gérés par la plateforme). Une managed identity ne correspond pas à un compte utilisateur humain.\n\n## Cinématique simplifiée : une managed identity\n\n```text\nApplication sur Azure\n  → demande un token à l'identité managée locale\nInfrastructure Azure / Entra ID\n  → émet un access token destiné au stockage\nApplication\n  → appelle le stockage avec ce token\nStockage\n  → valide le token et contrôle les permissions\n```\n\n**Différence importante :** avec un service principal classique, l'application peut s'authentifier au moyen d'un secret client, d'un certificat ou d'une fédération d'identité. Avec une managed identity, Azure gère les identifiants d'authentification : le développeur n'a pas à conserver un mot de passe applicatif dans un fichier `.env`.\n\nDeux variantes existent : **system-assigned**, liée au cycle de vie d'une ressource Azure, et **user-assigned**, créée séparément et éventuellement partagée entre plusieurs ressources. Le choix dépend notamment des besoins d'isolation et de gestion du cycle de vie.\n\n## Le piège de sécurité : une identité sans secret n'est pas sans risque\n\nSupposons que la machine hébergeant l'application soit compromise. Un attaquant capable d'exécuter du code dans le contexte autorisé pourrait demander des tokens via la managed identity et utiliser ses permissions. La suppression du secret statique réduit un risque, mais **ne remplace pas le moindre privilège**.\n\nAutre subtilité documentée par Microsoft : certaines modifications de groupes ou de rôles présents dans les tokens de managed identities peuvent mettre plusieurs heures à se refléter, du fait du cache des tokens. Ne présume pas qu'un changement d'habilitation est instantané.\n\n## Réflexe d'architecte IAM\n\nPour chaque échange machine-à-machine, identifie **qui s'authentifie**, **comment le token est obtenu**, **à quelle API il est destiné** et **quelles permissions exactes sont accordées**. Privilégie une identité dédiée par périmètre de confiance et des droits minimaux. Dans un contexte non Azure, étudie les mécanismes équivalents de fédération ou d'identité de workload plutôt que de réutiliser un compte humain.\n\n**Trois termes :** *service principal* (instance d'application dans un tenant), *managed identity* (identité technique gérée par Azure), *least privilege* (moindre privilège).",
+      "takeaways": [
+        "Une application peut s'authentifier sans utilisateur humain.",
+        "Managed identity évite de gérer un secret applicatif statique.",
+        "Sans secret ne veut pas dire sans permissions ni risque."
+      ],
+      "sources": [
+        {
+          "title": "Microsoft Learn — Workload identities",
+          "url": "https://learn.microsoft.com/en-us/entra/workload-id/workload-identities-overview"
+        },
+        {
+          "title": "Microsoft Learn — Managed identities for Azure resources",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview"
+        },
+        {
+          "title": "Microsoft Learn — Managed identity best practice recommendations",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/managed-identity-best-practice-recommendations"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Quel objet représente une application dans un tenant Entra ID ?",
+          "options": [
+            "Service principal",
+            "ID token",
+            "Compte administrateur humain"
+          ],
+          "answer": 0,
+          "explanation": "Le service principal est l'instance locale de l'application dans le tenant."
+        },
+        {
+          "question": "Quel avantage principal offre une managed identity ?",
+          "options": [
+            "Elle supprime tous les contrôles d'accès",
+            "Elle évite la gestion de secrets applicatifs statiques",
+            "Elle donne automatiquement tous les droits"
+          ],
+          "answer": 1,
+          "explanation": "Azure gère les identifiants d'authentification, mais les permissions doivent être configurées."
+        },
+        {
+          "question": "Une managed identity empêche-t-elle toute utilisation abusive après compromission de l'hôte ?",
+          "options": [
+            "Oui, toujours",
+            "Oui, si le token est un JWT",
+            "Non, l'attaquant pourrait exploiter ses permissions"
+          ],
+          "answer": 2,
+          "explanation": "Le moindre privilège et la protection de l'environnement d'exécution restent essentiels."
         }
       ]
     }
