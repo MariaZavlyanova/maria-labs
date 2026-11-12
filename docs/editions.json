@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-12T09:00:00+01:00",
+  "updatedAt": "2026-11-12T08:37:55.184Z",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -856,6 +856,68 @@
           ],
           "answer": 2,
           "explanation": "Le webhook vérifié porte l’état de paiement asynchrone et permet une réconciliation fiable."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-12",
+      "category": "cyber",
+      "date": "2026-11-12",
+      "number": 14,
+      "title": "PIM : administrateur seulement quand c'est nécessaire",
+      "summary": "Avec Privileged Identity Management, distinguer un rôle éligible d'un rôle actif et réduire les privilèges permanents.",
+      "tag": "PAM · Entra ID · Just-in-time",
+      "minutes": 4,
+      "content": "Après les identités applicatives, regardons les **comptes humains à privilèges**. Une personne qui administre Entra ID doit-elle disposer de ses droits sensibles 24 heures sur 24 ? Non : c'est le problème auquel répond **Privileged Identity Management (PIM)**.\n\n## Le principe : éligible n'est pas actif\n\nDans Microsoft Entra PIM, un administrateur peut être **éligible** à un rôle sans en détenir les permissions en permanence. Lorsqu'une intervention l'exige, il **active** temporairement le rôle. Selon la politique configurée, l'activation peut nécessiter MFA, justification, ticket d'incident ou approbation. Une durée maximale borne ensuite l'accès.\n\nC'est une application du **Just-in-Time (JIT)** : attribuer un privilège au moment où il est nécessaire plutôt que le laisser actif en permanence. PIM couvre notamment des rôles Entra ID, des rôles Azure et des appartenances à des groupes compatibles.\n\n## Exemple : dépannage d'un problème de connexion\n\nImaginons une grande entreprise dont une administratrice doit modifier une configuration d'authentification. Le rôle adapté lui a été attribué comme *eligible*, et non comme *active*.\n\n1. Elle ouvre PIM et demande l'activation du rôle pour une heure.\n2. Elle fournit une justification ; la politique peut imposer une authentification renforcée et une approbation.\n3. Après activation, elle effectue la modification autorisée.\n4. À l'expiration, l'attribution active prend fin ; l'opération reste traçable dans les journaux d'audit.\n\n**Attention :** le rôle doit être suffisamment précis. Activer *Global Administrator* pour une opération réalisable avec un rôle plus restreint ne respecte pas le moindre privilège.\n\n## Le piège : « temporaire » ne veut pas dire « instantanément révoqué partout »\n\nUne application peut conserver une session ou mettre en cache les droits de l'utilisateur. La fin d'une attribution PIM ne garantit donc pas la disparition immédiate de tous les accès applicatifs déjà établis. C'est le lien avec notre leçon sur CAE : il faut distinguer **fin du privilège dans l'annuaire**, **réévaluation des sessions** et **contrôle effectif de la ressource**.\n\nAutre précaution : prévoir des comptes d'accès d'urgence (*break-glass*) correctement sécurisés, pour ne pas bloquer toute l'administration en cas d'indisponibilité des mécanismes habituels. Microsoft recommande des comptes d'urgence distincts des usages ordinaires.\n\n**Question d'architecture :** quels rôles sont permanents, lesquels pourraient devenir éligibles, et quelle preuve d'activation conserver dans les audits ?\n\n**Vocabulaire :** *eligible assignment* (rôle activable), *active assignment* (rôle effectivement attribué), *JIT* (accès juste à temps).",
+      "takeaways": [
+        "Éligible ne signifie pas autorisé à agir immédiatement.",
+        "PIM permet une activation limitée et auditée des privilèges.",
+        "La fin du rôle ne ferme pas forcément toutes les sessions."
+      ],
+      "sources": [
+        {
+          "title": "Microsoft Learn — Plan a PIM deployment",
+          "url": "https://learn.microsoft.com/entra/id-governance/privileged-identity-management/pim-deployment-plan"
+        },
+        {
+          "title": "Microsoft Learn — Configure Entra role settings in PIM",
+          "url": "https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-how-to-change-default-settings"
+        },
+        {
+          "title": "Microsoft Learn — Activate group membership in PIM",
+          "url": "https://learn.microsoft.com/en-us/azure/active-directory/privileged-identity-management/groups-activate-roles"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Un administrateur éligible possède-t-il immédiatement les droits du rôle ?",
+          "options": [
+            "Oui, toujours",
+            "Non, il doit l'activer",
+            "Seulement avec un ID token"
+          ],
+          "answer": 1,
+          "explanation": "L'éligibilité donne la possibilité de demander l'activation, pas le privilège actif."
+        },
+        {
+          "question": "Quel contrôle peut être exigé lors d'une activation PIM ?",
+          "options": [
+            "Une justification et un MFA",
+            "Un changement d'adresse IP obligatoire",
+            "La suppression du compte"
+          ],
+          "answer": 0,
+          "explanation": "Les politiques PIM peuvent imposer MFA, justification, approbation et durée maximale."
+        },
+        {
+          "question": "À l'expiration du rôle, toutes les sessions applicatives sont-elles forcément coupées immédiatement ?",
+          "options": [
+            "Oui, dans toutes les applications",
+            "Oui, si le rôle était éligible",
+            "Non, certaines sessions ou caches peuvent persister"
+          ],
+          "answer": 2,
+          "explanation": "Il faut vérifier la propagation des droits et la gestion des sessions par les ressources."
         }
       ]
     }
