@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-11T08:34:12.907Z",
+  "updatedAt": "2026-11-12T09:00:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -790,6 +790,72 @@
           ],
           "answer": 2,
           "explanation": "Le moindre privilège et la protection de l'environnement d'exécution restent essentiels."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-12",
+      "category": "fintech",
+      "date": "2026-11-12",
+      "number": 6,
+      "title": "Paiement agentique : le 3DS reste un contrôle de la banque",
+      "summary": "Un token délégué ne remplace pas la SCA : l’émetteur peut encore demander une authentification forte au moment de payer.",
+      "tag": "3DS · SCA · AP2",
+      "minutes": 4,
+      "content": "Un token de paiement délégué réduit l’exposition des données carte ; il ne garantit pas qu’un paiement sera accepté sans interaction. En Europe, la **Strong Customer Authentication (SCA)** est l’exigence réglementaire de vérification forte du payeur dans les cas prévus par PSD2. **3D Secure (3DS)** est l’un des protocoles que les réseaux et banques utilisent couramment pour réaliser cette vérification. Ce ne sont donc pas des synonymes : SCA est une obligation/règle ; 3DS est un mécanisme technique possible pour l’appliquer.\n\nDans ACP, OpenAI prépare une demande de paiement unique, limitée par un montant maximal et une expiration. Le PSP émet un token que le marchand utilise dans son flux habituel d’autorisation. Le marchand reste Merchant of Record, et son PSP, le réseau puis la banque émettrice peuvent toujours appliquer leurs contrôles de risque. Un token ne « pré-approuve » pas universellement une carte.\n\nPour ton scénario de réservation de groupe, imagine : le panier final est à 1 240 €. L’utilisateur l’approuve dans l’assistant. Le marchand transmet ensuite le token délégué à Stripe et crée son PaymentIntent. Si l’émetteur impose un challenge 3DS, l’assistant doit faire remonter un état `requires_action` vers une **surface de confiance** où l’utilisateur valide — par exemple une page bancaire ou une application mobile. L’agent ne voit ni code à usage unique ni secret bancaire ; il attend simplement l’état final.\n\nAP2 rend cette séparation très explicite. Dans le flux *Human Present*, la surface de confiance obtient consentement et authentification, puis le Credential Provider vérifie le mandat lié au checkout avant de délivrer un credential de paiement borné. Même avec un mandat valide, la banque peut choisir de déclencher ses mécanismes existants, dont 3DS2. AP2 est actuellement une **spécification** ; ce n’est pas une dispense de SCA ni une intégration de production universelle. genui{\"citation\":{\"refs\":[\"turn1search5\",\"turn1search7\"]}}\n\n**Cinématique**\n\n`Assistant → Marchand` : panier calculé, total affiché et consentement recueilli.  \n`Marchand → PSP/wallet` : création du paiement avec token délégué.  \n`PSP → réseau/banque` : demande d’autorisation et évaluation de risque.  \n`Banque → Utilisateur` : challenge 3DS éventuel sur une surface de confiance.  \n`Banque → Marchand` : autorisation/refus ; le marchand publie ensuite l’état de commande par webhook.\n\n**Geste POC du jour :** modélise explicitement l’état `requires_customer_action` dans ta commande. Ne passe jamais directement de `payment_pending` à `paid`. Prévois une transition idempotente `pending → requires_customer_action → processing → succeeded|failed`, et n’émets la réservation ferme qu’après le webhook Stripe vérifié. Teste aussi le retour tardif d’un webhook après expiration de session.",
+      "takeaways": [
+        "SCA est une exigence réglementaire ; 3DS est un mécanisme fréquent pour satisfaire l’authentification forte.",
+        "Le token délégué protège le moyen de paiement, mais ne supprime ni le risque ni le contrôle de l’émetteur.",
+        "Un POC crédible traite le challenge client et le webhook final comme des états métier distincts."
+      ],
+      "sources": [
+        {
+          "title": "OpenAI Developers — Agentic Commerce key concepts",
+          "url": "https://developers.openai.com/commerce/guides/key-concepts"
+        },
+        {
+          "title": "Stripe — 3D Secure et authentification de paiement",
+          "url": "https://stripe.com/gb/legal/privacy-center"
+        },
+        {
+          "title": "AP2 — Human Present flow",
+          "url": "https://ap2-protocol.org/ap2/flows/"
+        },
+        {
+          "title": "UCP — Release v2026-08-25 et améliorations 3DS2",
+          "url": "https://ucp.dev/documentation/announcements/"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Quelle distinction est correcte ?",
+          "options": [
+            "SCA est une obligation ; 3DS est un protocole qui peut aider à l’appliquer",
+            "3DS remplace automatiquement toute SCA",
+            "SCA est un type de token Stripe"
+          ],
+          "answer": 0,
+          "explanation": "PSD2 encadre la SCA ; 3DS est un standard technique fréquemment utilisé par les réseaux et émetteurs."
+        },
+        {
+          "question": "Si un émetteur demande un challenge 3DS, que doit faire l’agent ?",
+          "options": [
+            "Lire le code bancaire pour l’utilisateur",
+            "Faire présenter l’action à l’utilisateur sur une surface de confiance",
+            "Capturer le paiement sans attendre"
+          ],
+          "answer": 1,
+          "explanation": "L’agent ne doit jamais recevoir les secrets bancaires ; il attend le résultat de l’authentification."
+        },
+        {
+          "question": "Quel événement rend la réservation réellement ferme dans le POC ?",
+          "options": [
+            "La création du panier",
+            "L’affichage du token délégué",
+            "Le webhook Stripe vérifié confirmant l’issue du paiement"
+          ],
+          "answer": 2,
+          "explanation": "Le webhook vérifié porte l’état de paiement asynchrone et permet une réconciliation fiable."
         }
       ]
     }
