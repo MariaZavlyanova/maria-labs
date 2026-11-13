@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-12T08:37:55.184Z",
+  "updatedAt": "2026-11-13T09:00:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -918,6 +918,72 @@
           ],
           "answer": 2,
           "explanation": "Il faut vérifier la propagation des droits et la gestion des sessions par les ressources."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-13",
+      "category": "fintech",
+      "date": "2026-11-13",
+      "number": 7,
+      "title": "Paiement agentique : le webhook est la preuve opérationnelle",
+      "summary": "Un appel de paiement accepté ne suffit pas : l’état final doit être confirmé, signé, dédupliqué et réconcilié.",
+      "tag": "Webhooks · Réconciliation · UCP",
+      "minutes": 4,
+      "content": "Après le checkout et le challenge 3DS, reste la partie qui rend un paiement réellement exploitable : **la confirmation asynchrone**. Un appel API qui retourne `200` ou `processing` indique seulement que la demande a été reçue ou lancée. Il ne prouve ni que la banque a autorisé le paiement, ni que la réservation doit être émise.\n\nDans ton POC, Stripe est le système qui confirme l’issue financière ; le marchand est celui qui transforme cette issue en commande ferme. Cette confirmation arrive habituellement par **webhook**. Ton serveur doit vérifier la signature, identifier l’événement, le traiter une seule fois puis mettre à jour la commande de façon transactionnelle. L’interface de l’agent est une vue : elle doit refléter le statut métier du marchand, jamais l’inférer depuis la réponse initiale.\n\nACP suit ce modèle : le marchand renvoie un checkout complet lors des appels synchrones, puis publie des événements de cycle de vie de commande pour que la plateforme reste synchronisée. Le protocole demande signature, horodatage, traçabilité et idempotence : c’est un socle de **production**, même si l’Instant Checkout ChatGPT reste réservé à des partenaires approuvés. genui{\"citation\":{\"refs\":[\"turn2search2\",\"turn2search3\"]}}\n\nUCP va plus loin dans sa spécification d’événements : le webhook contient un `Webhook-Id`, un horodatage et le **snapshot complet** de la commande ; les livraisons sont signées, et les retries gardent le même identifiant. La plateforme accuse réception rapidement, traite ensuite de façon asynchrone, et peut réconcilier par `GET /orders/{id}`. C’est actuellement une **spécification**, pas une capacité automatique de ton API. genui{\"citation\":{\"refs\":[\"turn2search5\",\"turn2search7\",\"turn2search8\"]}}\n\nAP2 complète l’audit plutôt que l’orchestration d’événements : un *Payment Receipt* lie un résultat `Success` ou `Error` à un mandat, avec identifiants PSP et réseau lorsque disponibles. C’est utile pour un litige, mais il faut toujours ton propre modèle de commande et de réconciliation. genui{\"citation\":{\"refs\":[\"turn2search9\",\"turn2search10\"]}}\n\n**Cinématique**\n\n`Assistant → Marchand` : demande de finalisation, réponse `payment_pending`.  \n`Marchand → PSP/wallet → réseau/banque` : autorisation et éventuel traitement différé.  \n`PSP → Marchand` : webhook signé de succès, échec ou traitement.  \n`Marchand → Assistant` : événement `order.confirmed` ou `order.canceled` avec état complet.  \nL’assistant n’accède à aucune donnée carte ; il affiche la décision du marchand.\n\n**Geste POC du jour :** crée une table `processed_webhook_events` indexée de façon unique par `provider + event_id`. Dans le handler Stripe : vérifie la signature sur le corps brut, insère l’ID d’événement, puis dans la même transaction mets à jour `payment_status` et `order_status`. Si l’insert échoue pour unicité, retourne `2xx` sans retraiter. Ajoute une tâche de réconciliation : toute commande `payment_pending` depuis plus de 10 minutes est relue côté Stripe avant toute annulation.",
+      "takeaways": [
+        "Un retour synchrone n’est pas la preuve finale d’un paiement ni d’une réservation.",
+        "Signature, déduplication et transitions transactionnelles rendent le webhook fiable malgré les retries.",
+        "Le paiement, la commande et la vue de l’assistant doivent être réconciliés par des identifiants corrélés."
+      ],
+      "sources": [
+        {
+          "title": "OpenAI Developers — Agentic Checkout Spec",
+          "url": "https://developers.openai.com/commerce/specs/checkout"
+        },
+        {
+          "title": "UCP — Order capability et webhooks",
+          "url": "https://ucp.dev/specification/shopping/order/"
+        },
+        {
+          "title": "UCP — HTTP Message Signatures",
+          "url": "https://ucp.dev/specification/signatures/"
+        },
+        {
+          "title": "AP2 — Payment Mandate and Receipt",
+          "url": "https://ap2-protocol.org/ap2/payment_mandate/"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Pourquoi ne faut-il pas marquer une commande comme payée dès le retour de l’appel de paiement ?",
+          "options": [
+            "Parce qu’un état peut rester processing ou échouer ultérieurement",
+            "Parce que les webhooks sont réservés au catalogue",
+            "Parce que l’agent doit choisir le statut"
+          ],
+          "answer": 0,
+          "explanation": "Le résultat financier final est souvent asynchrone ; le webhook signé fait foi pour le traitement métier."
+        },
+        {
+          "question": "Quel mécanisme empêche de traiter deux fois la même livraison webhook ?",
+          "options": [
+            "Un identifiant d’événement stocké avec contrainte d’unicité",
+            "Le montant de la commande",
+            "Le nom du client"
+          ],
+          "answer": 0,
+          "explanation": "La déduplication se fait sur un identifiant d’événement stable, conservé à travers les retries."
+        },
+        {
+          "question": "Que doit afficher l’assistant après un paiement ?",
+          "options": [
+            "Son interprétation de la réponse initiale",
+            "L’état de commande confirmé par le marchand",
+            "Le token de paiement délégué"
+          ],
+          "answer": 1,
+          "explanation": "Le marchand est la source de vérité du cycle de commande et publie les états à la plateforme."
         }
       ]
     }
