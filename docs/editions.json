@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-13T09:00:00+01:00",
+  "updatedAt": "2026-11-13T08:44:08.145Z",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -984,6 +984,68 @@
           ],
           "answer": 1,
           "explanation": "Le marchand est la source de vérité du cycle de commande et publie les états à la plateforme."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-13",
+      "category": "cyber",
+      "date": "2026-11-13",
+      "number": 15,
+      "title": "Access Reviews : qui vérifie que les droits sont toujours justifiés ?",
+      "summary": "Une authentification robuste ne suffit pas si les collaborateurs conservent d'anciens accès. Découvre les revues périodiques de droits dans Entra ID Governance.",
+      "tag": "IGA · Gouvernance des accès",
+      "minutes": 4,
+      "content": "Après PIM, qui limite la durée d'activation des privilèges, abordons un autre problème : **comment détecter les droits qui restent attribués alors qu'ils ne sont plus nécessaires ?**\n\n## Pourquoi revoir les accès ?\n\nUne collaboratrice rejoint une équipe achats et obtient l'accès à une application de gestion des fournisseurs. Six mois plus tard, elle change de service. Son compte reste actif, son MFA fonctionne, mais son ancienne appartenance au groupe *Achats-Fournisseurs* n'a pas été supprimée.\n\nLe SSO vérifie qu'elle peut se connecter ; il ne prouve pas qu'elle a **encore besoin** de cette application. C'est un sujet d'**IGA (Identity Governance and Administration)** : vérifier périodiquement la légitimité des habilitations.\n\n## La cinématique d'une Access Review\n\nMicrosoft Entra ID Governance permet de créer une revue ponctuelle ou récurrente des membres d'un groupe, des affectations à une application et, dans les parcours adaptés, des rôles privilégiés. La revue peut être confiée au propriétaire du groupe, à un manager ou à un responsable désigné.\n\n```text\nAdministrateur IGA → définit périmètre, réviseurs et échéance\nEntra ID → présente la liste des accès à examiner\nResponsable métier → approuve ou refuse chaque accès\nFin de revue → application des décisions selon configuration\nJournal d'audit → trace les décisions et leur traitement\n```\n\nDans notre exemple, le responsable achats constate que la collaboratrice a changé d'équipe et refuse le maintien de son accès. À la clôture, si l'application des résultats est configurée, l'affectation concernée peut être supprimée.\n\n**Point technique important :** une décision « Refuser » ne signifie pas nécessairement suppression immédiate. Les résultats sont appliqués à la fin de la revue, automatiquement si cette option est activée, ou manuellement par l'administrateur. Et si l'accès provient d'un groupe imbriqué ou d'un système externe, il faut vérifier l'effet réel de la décision.\n\n## Trois pièges d'architecture\n\n**1. Le mauvais réviseur.** Un manager hiérarchique ne connaît pas toujours la sensibilité de l'application ; un propriétaire métier peut mieux juger la nécessité de l'accès.\n\n**2. L'approbation automatique par habitude.** Entra peut fournir des recommandations basées notamment sur l'inactivité, mais elles restent des aides à la décision, pas une preuve que le droit est inutile.\n\n**3. La fausse clôture.** Une décision tracée n'est pas équivalente à une révocation effectivement propagée dans l'application cible. Prévois un contrôle de réconciliation après la revue.\n\n**Réflexe d'architecte :** pour chaque application sensible, identifie la source d'attribution des droits, le propriétaire métier, la fréquence de recertification et la preuve de retrait. Les fonctionnalités exactes dépendent des licences Entra.\n\n**Vocabulaire :** *access review* (revue de droits), *recertification* (validation périodique), *entitlement* (habilitation attribuée).",
+      "takeaways": [
+        "Le SSO authentifie ; l'IGA vérifie la légitimité durable des droits.",
+        "Une revue associe un propriétaire à une décision documentée.",
+        "Une décision de retrait doit être suivie d'une révocation effective."
+      ],
+      "sources": [
+        {
+          "title": "Microsoft Learn — What are access reviews?",
+          "url": "https://learn.microsoft.com/en-us/entra/id-governance/access-reviews-overview"
+        },
+        {
+          "title": "Microsoft Learn — Create an access review",
+          "url": "https://learn.microsoft.com/en-us/entra/id-governance/create-access-review"
+        },
+        {
+          "title": "Microsoft Learn — Complete an access review",
+          "url": "https://learn.microsoft.com/en-us/entra/id-governance/complete-access-review"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Une connexion SSO réussie prouve-t-elle que le collaborateur a encore besoin de tous ses droits ?",
+          "options": [
+            "Oui",
+            "Non",
+            "Seulement avec MFA"
+          ],
+          "answer": 1,
+          "explanation": "L'authentification ne prouve pas la légitimité métier des habilitations."
+        },
+        {
+          "question": "Qui peut être chargé de revoir les droits d'un groupe ?",
+          "options": [
+            "Son propriétaire ou un réviseur désigné",
+            "Uniquement l'utilisateur concerné",
+            "Uniquement le fournisseur d'identité"
+          ],
+          "answer": 0,
+          "explanation": "Les revues peuvent être confiées à des responsables métier, managers ou réviseurs désignés."
+        },
+        {
+          "question": "Un refus dans une Access Review retire-t-il toujours immédiatement le droit ?",
+          "options": [
+            "Oui, instantanément",
+            "Oui, dès que le manager clique",
+            "Non, l'application des résultats dépend de la configuration et de la clôture"
+          ],
+          "answer": 2,
+          "explanation": "Il faut appliquer les décisions puis vérifier le retrait effectif."
         }
       ]
     }
