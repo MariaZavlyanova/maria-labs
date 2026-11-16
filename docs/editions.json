@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-13T08:44:08.145Z",
+  "updatedAt": "2026-11-16T09:00:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1046,6 +1046,72 @@
           ],
           "answer": 2,
           "explanation": "Il faut appliquer les décisions puis vérifier le retrait effectif."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-16",
+      "category": "fintech",
+      "date": "2026-11-16",
+      "number": 8,
+      "title": "Paiement agentique : s’identifier n’est pas autoriser un achat",
+      "summary": "Relier le compte client, déléguer une action et autoriser un paiement sont trois preuves distinctes à ne pas fusionner.",
+      "tag": "Identité · OAuth · Mandat",
+      "minutes": 4,
+      "content": "Pour un agent de réservation de train, trois questions paraissent proches mais doivent rester séparées :\n\n1. **Qui est la personne ?** — authentification : elle se connecte à son compte marchand.  \n2. **Que peut faire l’assistant ?** — autorisation : lire la fidélité, retrouver une adresse ou gérer un panier, avec des scopes limités.  \n3. **Quel achat est approuvé ?** — consentement/mandat : tel trajet, tels voyageurs, tel montant et telle expiration.\n\nUn jeton OAuth lié au compte SNCF fictif ne doit donc jamais être interprété comme un droit général de payer. Il prouve qu’une plateforme peut appeler des API dans les scopes accordés. Le paiement nécessite encore un checkout précis, une approbation de l’utilisateur et le contrôle du PSP/de la banque.\n\nUCP formalise l’*Identity Linking* via OAuth 2.0 : l’utilisateur consent au lien entre son compte sur la plateforme et son compte chez le marchand. La version récente prescrit Authorization Code + PKCE S256, un `state` non prédictible, validation de l’émetteur `iss`, correspondance exacte de `redirect_uri` et révocation lors de l’unlink. C’est une **spécification** : elle structure l’accès à la fidélité, aux offres ou à l’historique ; elle n’autorise pas à elle seule le paiement.\n\nCôté ACP, OpenAI recommande de permettre découverte et panier en mode invité, puis de demander la connexion seulement quand elle apporte une valeur, par exemple pour un tarif fidélité ou le suivi de commande. *Sign in with ChatGPT* est réservé à des partenaires commerciaux sélectionnés ; surtout, l’identité ChatGPT doit être vérifiée et liée au compte marchand avec consentement. Une correspondance d’e-mail seule ne prouve pas que le compte lui appartient.\n\nAP2 apporte la preuve d’action : l’utilisateur approuve un mandat sur une surface de confiance, puis l’agent présente ce mandat à un vérificateur. Le mandat peut ne révéler que les informations nécessaires. Le vérificateur renvoie un reçu signé ; ce modèle est actuellement une **spécification**, complémentaire à ACP/UCP, et non un mécanisme OAuth de substitution.\n\n**Cinématique**\n\n`Utilisateur → Marchand` : login et consentement OAuth éventuels.  \n`Assistant → Marchand` : Bearer token à scopes limités pour panier/avantages.  \n`Assistant → Utilisateur` : affiche le checkout final et demande l’approbation d’achat.  \n`Assistant → PSP/wallet → réseau/banque` : délégation/token de paiement borné ; l’agent ne reçoit jamais la carte.  \n`Marchand` : vérifie à la fois l’identité, les scopes et le mandat de paiement avant de créer l’ordre.\n\n**Geste POC du jour :** sépare trois objets dans ton modèle : `customer_session` (identité), `merchant_access_grant` (scopes OAuth) et `payment_authorization` (checkout_id, montant, devise, expiration). Ajoute un test : un access token valide avec le scope `loyalty.read` doit pouvoir afficher une réduction, mais le endpoint `/pay` doit refuser sans `payment_authorization` encore valide.",
+      "takeaways": [
+        "Identité, accès API et consentement de paiement sont trois niveaux de preuve différents.",
+        "OAuth/PKCE sécurise le lien de compte ; il ne vaut jamais mandat de paiement.",
+        "Le POC doit conserver scopes, checkout et autorisation de paiement dans des objets séparés."
+      ],
+      "sources": [
+        {
+          "title": "UCP — Identity Linking Capability",
+          "url": "https://ucp.dev/2026-04-08/specification/identity-linking/"
+        },
+        {
+          "title": "OpenAI Developers — Integrate Sign in with ChatGPT",
+          "url": "https://developers.openai.com/commerce/guides/integrate-sign-in-with-chatgpt"
+        },
+        {
+          "title": "OpenAI Developers — Build a commerce plugin",
+          "url": "https://developers.openai.com/commerce/guides/build-a-plugin"
+        },
+        {
+          "title": "AP2 — Agent Authorization Framework",
+          "url": "https://ap2-protocol.org/ap2/agent_authorization/"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Un access token OAuth donnant accès aux avantages fidélité autorise-t-il le paiement ?",
+          "options": [
+            "Oui, automatiquement",
+            "Non, il faut une autorisation de paiement liée au checkout",
+            "Oui, seulement avec PKCE"
+          ],
+          "answer": 1,
+          "explanation": "Le scope OAuth contrôle l’accès API ; le paiement exige une autorisation propre au checkout et les contrôles du PSP."
+        },
+        {
+          "question": "Quel mécanisme UCP protège l’échange d’un code OAuth pour un client public ?",
+          "options": [
+            "PKCE avec S256",
+            "Un token de paiement délégué",
+            "Un webhook de commande"
+          ],
+          "answer": 0,
+          "explanation": "PKCE lie l’échange du code à la transaction initiée par le client."
+        },
+        {
+          "question": "Pourquoi l’e-mail seul ne suffit-il pas à lier un compte marchand ?",
+          "options": [
+            "Il rend le panier trop long",
+            "Il ne prouve pas la propriété du compte",
+            "Il empêche toute authentification bancaire"
+          ],
+          "answer": 1,
+          "explanation": "Une correspondance d’adresse ne constitue pas une preuve robuste de contrôle du compte."
         }
       ]
     }
