@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-16T09:00:00+01:00",
+  "updatedAt": "2026-11-16T08:59:04.562Z",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1112,6 +1112,68 @@
           ],
           "answer": 1,
           "explanation": "Une correspondance d’adresse ne constitue pas une preuve robuste de contrôle du compte."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-16",
+      "category": "cyber",
+      "date": "2026-11-16",
+      "number": 16,
+      "title": "JML : pourquoi la date de départ RH ne suffit pas à couper les accès",
+      "summary": "Lifecycle Workflows automatise les étapes Joiner, Mover, Leaver, mais le délai de déclenchement et le retrait réel doivent être contrôlés.",
+      "tag": "IGA · Cycle de vie",
+      "minutes": 4,
+      "content": "Vendredi, nous avons étudié les **Access Reviews** : vérifier périodiquement que les droits restent justifiés. Aujourd'hui, passons à une approche proactive : **retirer les accès dès qu'un événement RH le nécessite**.\n\n## 1. Joiner, Mover, Leaver : trois événements, trois risques\n\nLe modèle **JML** structure le cycle de vie d'une identité :\n\n- **Joiner** : arrivée d'un salarié ; créer son identité et lui donner les accès nécessaires.\n- **Mover** : changement de poste ; attribuer les nouveaux droits **et retirer les anciens**.\n- **Leaver** : départ ; désactiver les accès et déclencher les opérations de sortie.\n\nExemple fictif : une collaboratrice quitte l'équipe achats pour rejoindre la finance. Lui ajouter les accès finance sans retirer ses accès achats crée une accumulation de privilèges (*privilege creep*).\n\n## 2. La cinématique d'un départ\n\nDans une architecture d'entreprise, le système RH peut être la **source d'autorité** pour le statut et la date de départ.\n\n```text\nSIRH (date de départ)\n    ↓ synchronisation des attributs\nEntra ID (employeeLeaveDateTime)\n    ↓ déclenchement du workflow\nLifecycle Workflows\n    ├─ désactivation du compte\n    ├─ retrait des groupes / access packages\n    └─ journalisation des opérations\n    ↓ provisioning / déprovisioning\nApplications cibles\n```\n\n**Fait documenté :** Microsoft Entra ID Governance propose des *Lifecycle Workflows* pour automatiser ces tâches, notamment la désactivation d'un compte et le retrait des appartenances. Des extensions peuvent appeler des systèmes externes.\n\n**Nuance importante :** un workflow exécuté n'est pas la preuve que toutes les applications ont effectivement supprimé les droits.\n\n## 3. Le piège des horaires\n\nLes workflows planifiés ne sont pas nécessairement instantanés. Microsoft indique une fréquence par défaut de **trois heures**, configurable selon les possibilités du service.\n\nSi une date de départ est renseignée à 10 h, l'exécution planifiée peut donc survenir plus tard. Il faut distinguer une **sortie prévue** d'une **révocation urgente** nécessitant un mécanisme immédiat, puis contrôler les sessions existantes.\n\nDe même, un compte désactivé dans Entra ID ne signifie pas automatiquement que chaque application locale ou SaaS a fermé toutes ses sessions.\n\n## 4. Le réflexe d'architecture\n\nPour chaque événement JML, vérifie quatre éléments : **source d'autorité**, **déclencheur**, **délai maximal acceptable**, **preuve de retrait dans les systèmes cibles**.\n\nPour un départ sensible, teste le parcours complet, y compris les erreurs de synchronisation et les applications non intégrées à SCIM.\n\n**Vocabulaire :** *Source of authority* (source faisant foi), *deprovisioning* (retrait des accès), *privilege creep* (accumulation de droits).",
+      "takeaways": [
+        "JML automatise l'arrivée, la mobilité et le départ.",
+        "Un workflow planifié peut avoir un délai d'exécution.",
+        "La désactivation centrale ne prouve pas le retrait partout."
+      ],
+      "sources": [
+        {
+          "title": "Microsoft Learn — Employee lifecycle automation",
+          "url": "https://learn.microsoft.com/en-us/entra/architecture/governance-deployment-employee-lifecycle"
+        },
+        {
+          "title": "Microsoft Learn — Plan a Lifecycle Workflow deployment",
+          "url": "https://learn.microsoft.com/en-us/entra/id-governance/lifecycle-workflows-deployment"
+        },
+        {
+          "title": "Microsoft Learn — Synchronize attributes for Lifecycle workflows",
+          "url": "https://learn.microsoft.com/en-us/entra/id-governance/how-to-lifecycle-workflow-sync-attributes"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Lors d'un changement de poste, quelle opération est essentielle ?",
+          "options": [
+            "Ajouter uniquement les nouveaux accès",
+            "Retirer aussi les droits devenus inutiles",
+            "Conserver tous les accès jusqu'au départ"
+          ],
+          "answer": 1,
+          "explanation": "Le Mover doit limiter l'accumulation de privilèges."
+        },
+        {
+          "question": "Une date de départ à 10 h garantit-elle une exécution du workflow à 10 h ?",
+          "options": [
+            "Oui, toujours",
+            "Oui, si le compte a un MFA",
+            "Non, la planification peut introduire un délai"
+          ],
+          "answer": 2,
+          "explanation": "Les workflows planifiés peuvent s'exécuter plus tard que l'heure de l'événement."
+        },
+        {
+          "question": "Quel contrôle confirme réellement le départ des applications ?",
+          "options": [
+            "Vérifier le déprovisioning dans les systèmes cibles",
+            "Vérifier uniquement l'état du compte Entra",
+            "Vérifier seulement l'email du manager"
+          ],
+          "answer": 0,
+          "explanation": "Le retrait effectif doit être vérifié dans chaque système concerné."
         }
       ]
     }
