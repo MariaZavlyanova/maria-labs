@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-16T08:59:04.562Z",
+  "updatedAt": "2026-11-17T09:00:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1174,6 +1174,72 @@
           ],
           "answer": 0,
           "explanation": "Le retrait effectif doit être vérifié dans chaque système concerné."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-17",
+      "category": "fintech",
+      "date": "2026-11-17",
+      "number": 9,
+      "title": "Paiement agentique : déléguer un budget, pas une carte blanche",
+      "summary": "Un mandat autonome utile décrit des contraintes vérifiables : marchand, montant, devise, échéance et réutilisation.",
+      "tag": "AP2 · Délégation · Garde-fous",
+      "minutes": 4,
+      "content": "Jusqu’ici, ton agent attendait l’utilisateur à l’étape de paiement. Mais le cas le plus intéressant pour ton POC est celui-ci : « Réserve les dix billets dès qu’ils sont disponibles, pour un total de 1 200 € maximum ». C’est une délégation **autonome** — et elle ne doit jamais devenir une permission vague de payer.\n\nLa règle : transformer une intention humaine en contraintes que des systèmes déterministes peuvent vérifier. Un mandat sûr contient au minimum le marchand autorisé, la devise, un plafond en unités mineures, une fenêtre d’exécution, la session ou le type de trajet accepté, et une règle de réutilisation. Il faut également définir ce qui déclenche une nouvelle approbation : tarif modifié, classe différente, voyageur supplémentaire, ou expiration du mandat.\n\nAP2 formalise ce modèle avec des mandats *open* et *closed*. Le mandat open contient les limites approuvées par l’utilisateur — par exemple budget, bénéficiaire autorisé et date d’exécution. Quand l’agent trouve un panier qui respecte ces limites, il crée un mandat closed, lié à ce checkout précis. Le vérificateur contrôle alors signature, clé de preuve de possession, expiration, montant, devise et cohérence de la chaîne. AP2 est une **spécification** : elle fournit un modèle de preuve, pas un service de paiement prêt à activer.\n\nLa granularité compte. « Billets SNCF < 1 200 € » est déjà plus sûr que « achat de train ». « Paris–Lyon, dix voyageurs nommés, seconde classe, départ avant 10 h, total ≤ 1 200 €, valable 48 h, une seule exécution » est mieux : chaque champ peut être comparé au checkout marchand. Si le marchand substitue un trajet ou si le total augmente de 1 €, l’agent doit obtenir une nouvelle approbation.\n\nOpenAI indique aussi que les credentials de paiement délégués ne doivent pas être réutilisés pour un achat distinct : le consentement porte sur une transaction spécifique. Dans son approche, un token de réseau est présenté au marchand/PSP sans exposer le numéro de carte à l’agent. Les intégrations ACP Instant Checkout restent soumises à l’éligibilité partenaire ; ne confonds pas ce modèle avec la disponibilité de ton POC de simulation.\n\n**Cinématique**\n\n`Utilisateur → Assistant` : définit destination, plafond, devise, durée et règle de réutilisation.  \n`Assistant → Marchand` : construit le panier et récupère l’état autoritaire.  \n`Assistant → vérificateur/PSP` : présente un mandat fermé lié au panier et un token borné.  \n`PSP → réseau/banque → Marchand` : autorise dans les limites ; l’agent ne reçoit pas de carte.  \n`Marchand → Assistant` : webhook de commande et reçu pour audit.\n\n**Geste POC du jour :** crée un endpoint `POST /delegations` qui enregistre un objet immutable : `merchant_id`, `max_amount_minor`, `currency`, `traveler_ids_hash`, `route_constraint`, `not_after`, `max_uses: 1`, `status`. Au paiement, exécute une fonction pure `validateDelegation(delegation, checkout)`. Refuse avec un code explicite : `merchant_mismatch`, `amount_exceeded`, `expired`, `route_mismatch` ou `already_used`.",
+      "takeaways": [
+        "L’autonomie est une délégation de contraintes vérifiables, jamais un accès libre au moyen de paiement.",
+        "Un mandat fermé doit être lié au checkout marchand final, à son montant et à son contexte.",
+        "Le POC doit refuser explicitement toute contrainte inconnue ou tout écart, puis demander une nouvelle approbation."
+      ],
+      "sources": [
+        {
+          "title": "OpenAI Developers — Accept payments",
+          "url": "https://developers.openai.com/commerce/guides/accept-payments"
+        },
+        {
+          "title": "AP2 — Payment Mandate constraints",
+          "url": "https://ap2-protocol.org/ap2/payment_mandate/"
+        },
+        {
+          "title": "AP2 — Agent Authorization Framework",
+          "url": "https://ap2-protocol.org/ap2/agent_authorization/"
+        },
+        {
+          "title": "UCP — AP2 Mandates Extension",
+          "url": "https://ucp.dev/specification/payment/extensions/ap2-mandates/"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Quelle délégation est la mieux définie ?",
+          "options": [
+            "« Achète un train quand tu veux »",
+            "« Réserve Paris–Lyon, 10 voyageurs, total ≤ 1 200 €, une fois, avant 48 h »",
+            "« Utilise ma carte pour les transports »"
+          ],
+          "answer": 1,
+          "explanation": "Les contraintes précises permettent au marchand et au PSP de vérifier objectivement l’action demandée."
+        },
+        {
+          "question": "Que doit faire l’agent si le checkout dépasse le plafond approuvé ?",
+          "options": [
+            "Payer si le dépassement est faible",
+            "Réutiliser le token avec le nouveau montant",
+            "Refuser et demander une nouvelle approbation"
+          ],
+          "answer": 2,
+          "explanation": "Le montant final doit respecter exactement le mandat ; sinon l’autorisation n’est plus valable."
+        },
+        {
+          "question": "À quoi sert le mandat closed dans AP2 ?",
+          "options": [
+            "À lier l’autorisation à une transaction/check-out précis",
+            "À stocker le numéro de carte",
+            "À remplacer le PSP"
+          ],
+          "answer": 0,
+          "explanation": "Le mandat closed est la preuve liée au checkout final ; il ne remplace pas les rails de paiement."
         }
       ]
     }
