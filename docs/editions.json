@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-17T09:00:00+01:00",
+  "updatedAt": "2026-11-17T08:14:46.373Z",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1240,6 +1240,64 @@
           ],
           "answer": 0,
           "explanation": "Le mandat closed est la preuve liée au checkout final ; il ne remplace pas les rails de paiement."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-17",
+      "category": "cyber",
+      "date": "2026-11-17",
+      "number": 17,
+      "title": "Groupes dynamiques Entra : les droits dépendent aussi de la qualité des attributs",
+      "summary": "Automatiser les appartenances aux groupes sans ouvrir une faille via des attributs modifiables.",
+      "tag": "IAM · Groupes dynamiques",
+      "minutes": 4,
+      "content": "Hier, nous avons vu le cycle **Joiner–Mover–Leaver**. Aujourd'hui, une brique concrète : comment attribuer ou retirer automatiquement une appartenance à un groupe quand un salarié change de service ? Avec les **groupes dynamiques** de Microsoft Entra ID.\n\n## 1. Un groupe qui se remplit selon une règle\n\nDans un groupe classique, un administrateur ajoute ou retire les membres. Dans un groupe dynamique, **Entra ID évalue les attributs des utilisateurs** : département, pays, type de compte, etc. Si la règle correspond, l'utilisateur est ajouté ; sinon, il est retiré après traitement.\n\nExemple fictif : un groupe `Finance-France` pourrait utiliser cette règle :\n\n```text\n(user.department -eq \"Finance\") -and\n(user.country -eq \"France\") -and\n(user.accountEnabled -eq true)\n```\n\nUne application métier peut ensuite attribuer des droits aux membres de ce groupe. Attention : **appartenir à un groupe n'accorde un accès que si la ressource utilise effectivement ce groupe pour ses autorisations**.\n\n## 2. Cinématique d'une mobilité\n\n```text\nSIRH : Alice passe de Finance à Achats\n          ↓\nAttribut department mis à jour dans Entra ID\n          ↓\nRéévaluation des règles des groupes dynamiques\n          ↓\nRetrait de Finance-France ; ajout à Achats-France\n          ↓\nApplications : prise en compte des nouvelles appartenances\n```\n\nC'est un exemple de **provisionnement fondé sur les attributs**. La mise à jour de l'annuaire et sa propagation aux applications ne sont pas nécessairement instantanées.\n\n## 3. Le piège de sécurité : qui peut modifier l'attribut ?\n\nImaginons que `Finance-France` donne accès à des documents sensibles. Si Alice peut elle-même modifier son attribut `department`, elle pourrait potentiellement se faire attribuer cet accès.\n\n**Le contrôle critique ne porte donc pas seulement sur la règle : il porte aussi sur la source de confiance et les droits d'écriture de chaque attribut.** Microsoft recommande explicitement d'auditer ces permissions, y compris dans les annuaires Active Directory synchronisés.\n\nAutre risque : un groupe en statut **Processing error** conserve ses membres issus de la dernière évaluation réussie. Des droits peuvent donc devenir obsolètes. Le statut de traitement et la date du dernier changement sont à superviser.\n\n## 4. Le réflexe d'architecture\n\nAvant d'utiliser un groupe dynamique pour piloter des accès, vérifie : **qui renseigne l'attribut ? qui peut le modifier ? quel délai de recalcul est acceptable ? et comment détecte-t-on les erreurs ?**\n\nPour des privilèges administratifs sensibles, les groupes assignables à des rôles Entra ne peuvent pas avoir une appartenance dynamique.\n\nTrois termes : **dynamic membership** (appartenance calculée), **source of authority** (source faisant foi), **attribute integrity** (fiabilité et protection de l'attribut).",
+      "takeaways": [
+        "Une règle d'attributs détermine automatiquement les membres.",
+        "La sécurité dépend des droits d'écriture sur les attributs.",
+        "Les erreurs de traitement peuvent laisser des droits obsolètes."
+      ],
+      "sources": [
+        {
+          "title": "Microsoft Learn — Manage rules for dynamic membership groups",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/users/groups-dynamic-membership"
+        },
+        {
+          "title": "Microsoft Learn — Create or update a dynamic membership group",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/users/groups-create-rule"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Qui détermine les membres d'un groupe dynamique Entra ?",
+          "options": [
+            "Une règle sur les attributs",
+            "Le MFA de l'utilisateur",
+            "L'API métier à chaque connexion"
+          ],
+          "answer": 0,
+          "explanation": "Entra évalue les attributs selon la règle de groupe."
+        },
+        {
+          "question": "Quel risque existe si un salarié peut modifier son attribut department ?",
+          "options": [
+            "Aucun si le groupe est dynamique",
+            "Il pourrait déclencher une attribution d'accès indue",
+            "Son ID token expire immédiatement"
+          ],
+          "answer": 1,
+          "explanation": "Les droits d'écriture sur les attributs sont un élément du modèle de sécurité."
+        },
+        {
+          "question": "Que se passe-t-il si la règle est en Processing error ?",
+          "options": [
+            "Tous les membres sont supprimés",
+            "Le groupe devient public",
+            "La liste peut rester figée à la dernière évaluation réussie"
+          ],
+          "answer": 2,
+          "explanation": "Le traitement en erreur ne met plus à jour les appartenances."
         }
       ]
     }
