@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-18T09:00:00+01:00",
+  "updatedAt": "2026-11-18T08:26:12.807Z",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1364,6 +1364,72 @@
           ],
           "answer": 1,
           "explanation": "La dé-tokenisation expose des données sensibles et doit être isolée chez un acteur réellement conforme."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-18",
+      "category": "cyber",
+      "date": "2026-11-18",
+      "number": 18,
+      "title": "Consent phishing : quand une application obtient l'accès sans voler le mot de passe",
+      "summary": "Une authentification légitime peut déboucher sur une autorisation OAuth dangereuse : comprendre le consentement applicatif et ses contrôles.",
+      "tag": "OAuth · Consent phishing",
+      "minutes": 4,
+      "content": "Hier, nous avons vu comment les attributs alimentent les groupes dynamiques. Aujourd'hui, un autre risque IAM : **une application malveillante peut obtenir l'accès aux données sans connaître le mot de passe de l'utilisateur**. C'est le *consent phishing*.\n\n## 1. Une vraie page Microsoft peut cacher une mauvaise autorisation\n\nImagine une collaboratrice recevant un lien vers « Analyseur de documents ». Elle arrive sur une authentique page de connexion Microsoft, s'authentifie avec son MFA, puis voit une demande : « Cette application souhaite lire vos fichiers ».\n\nElle accepte. Si les politiques du tenant autorisent ce consentement, l'application reçoit une **autorisation OAuth**. Elle peut ensuite demander des access tokens pour les ressources autorisées. Le mot de passe n'a pas été volé ; le problème est **l'autorisation accordée à la mauvaise application**.\n\nMicrosoft décrit explicitement ce scénario comme du *consent phishing*. Ce n'est pas une nouvelle vulnérabilité annoncée aujourd'hui, mais un mécanisme documenté.\n\n## 2. La cinématique simplifiée\n\n1. **Application tierce → Entra ID :** demande d'autorisation OAuth pour accéder à Microsoft Graph, avec des permissions précises.\n2. **Entra ID → Utilisatrice :** affiche la demande de consentement, selon la politique de l'organisation.\n3. **Utilisatrice → Entra ID :** approuve la demande si elle est autorisée à le faire.\n4. **Entra ID → Application :** après le flux OAuth, délivre un access token pour l'API et les permissions consenties.\n5. **Application → Microsoft Graph :** lit les données auxquelles elle a effectivement droit.\n\nL'API ne reçoit pas un ID token : elle reçoit un **access token**, conformément à notre précédente leçon.\n\n## 3. Délégué ou applicatif : attention à la portée\n\nUne **permission déléguée** agit dans le contexte d'un utilisateur connecté ; l'accès effectif dépend aussi des droits de cet utilisateur. Une **permission applicative** agit sans utilisateur connecté, par exemple pour un traitement nocturne, et nécessite un consentement administrateur.\n\nLe *consentement administrateur pour tout le tenant* est particulièrement sensible : il peut autoriser une application à accéder à de larges volumes de données. Mais ce consentement ne signifie pas automatiquement que tous les utilisateurs peuvent se connecter à l'application : les règles d'assignation restent distinctes.\n\n## 4. Le contrôle d'architecture\n\nPour une intégration SaaS fictive dans une grande entreprise, vérifie : **qui peut consentir**, **quelles permissions sont demandées**, **qui possède l'application** et **comment révoquer les droits accordés**.\n\nUn point subtil documenté par Microsoft : retirer une permission de la déclaration de l'application ne révoque pas automatiquement un consentement déjà accordé. Il faut aussi supprimer l'autorisation existante.\n\n**Trois termes :** *consent grant* (autorisation accordée), *delegated permission* (permission au nom d'un utilisateur), *application permission* (permission propre à l'application).",
+      "takeaways": [
+        "Un MFA réussi ne garantit pas qu'une application tierce est fiable.",
+        "Le consentement OAuth peut donner accès à des données sans vol de mot de passe.",
+        "Révoquer un droit accordé est distinct de supprimer sa déclaration."
+      ],
+      "sources": [
+        {
+          "title": "Microsoft Learn — Protect against consent phishing",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/protect-against-consent-phishing"
+        },
+        {
+          "title": "Microsoft Learn — Consent experience for applications",
+          "url": "https://learn.microsoft.com/en-us/entra/identity-platform/application-consent-experience"
+        },
+        {
+          "title": "Microsoft Learn — Update an app's requested permissions",
+          "url": "https://learn.microsoft.com/entra/identity-platform/howto-update-permissions"
+        },
+        {
+          "title": "Microsoft Learn — Grant tenant-wide admin consent",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/grant-admin-consent"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Le consent phishing nécessite-t-il de voler le mot de passe ?",
+          "options": [
+            "Oui, toujours",
+            "Non, il exploite un consentement OAuth",
+            "Seulement si le MFA est désactivé"
+          ],
+          "answer": 1,
+          "explanation": "Une application malveillante peut obtenir des permissions via un consentement légitime."
+        },
+        {
+          "question": "Quel jeton une application utilise-t-elle pour appeler Microsoft Graph ?",
+          "options": [
+            "Un access token",
+            "Un ID token",
+            "Le mot de passe de l'utilisateur"
+          ],
+          "answer": 0,
+          "explanation": "L'API attend un access token destiné à sa ressource."
+        },
+        {
+          "question": "Supprimer une permission déclarée révoque-t-il automatiquement le consentement déjà accordé ?",
+          "options": [
+            "Oui, immédiatement",
+            "Oui, après 24 heures",
+            "Non, il faut aussi révoquer l'autorisation existante"
+          ],
+          "answer": 2,
+          "explanation": "La déclaration et le consentement accordé sont deux objets distincts."
         }
       ]
     }
