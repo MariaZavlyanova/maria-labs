@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-17T08:14:46.373Z",
+  "updatedAt": "2026-11-18T09:00:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1298,6 +1298,72 @@
           ],
           "answer": 2,
           "explanation": "Le traitement en erreur ne met plus à jour les appartenances."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-18",
+      "category": "fintech",
+      "date": "2026-11-18",
+      "number": 10,
+      "title": "Paiement agentique : un token réduit le risque, il ne fait pas disparaître PCI",
+      "summary": "La tokenisation évite de diffuser le PAN, mais le marchand reste responsable de son périmètre, de ses prestataires et de ses contrôles.",
+      "tag": "Tokenisation · PCI DSS · PSP",
+      "minutes": 4,
+      "content": "La promesse pratique du paiement agentique est simple : l’agent ne reçoit pas le numéro de carte. Il transmet au marchand un **token** que le PSP ou le réseau sait résoudre dans son environnement sécurisé. Mais « nous utilisons des tokens » ne veut pas dire « nous n’avons plus aucune responsabilité PCI ».\n\nUn PAN est le numéro de carte. Le token est une valeur de substitution, souvent liée à un domaine d’utilisation — marchand, dispositif, session ou checkout — et parfois accompagnée d’un cryptogramme dynamique. Dans le modèle normal de ton POC, ton API marchand reçoit seulement une référence/token puis demande à Stripe d’autoriser le paiement. Elle ne stocke ni PAN, ni CVC, ni date d’expiration. C’est le bon choix de départ.\n\nLe PCI SSC indique qu’un token EMV conforme utilisé hors de l’environnement du Token Service Provider n’est généralement pas considéré comme de l’*Account Data*. Mais cette réduction de périmètre dépend de l’architecture réelle : si ton système peut accéder au coffre, dé-tokeniser, ou manipule ailleurs des données carte, il reste connecté au Cardholder Data Environment et peut demeurer dans le périmètre. Externaliser le traitement ne retire pas non plus la responsabilité du marchand : il doit sélectionner un prestataire conforme, contractualiser les responsabilités et suivre la conformité.\n\nLes dernières documentations OpenAI vont dans le même sens. Avec ChatGPT Wallet, le marchand reçoit en principe un network token et peut utiliser le PAR (*Payment Account Reference*) pour rapprocher les transactions sans manipuler le PAN. La réception de données carte brutes est réservée à un marchand PCI DSS Level 1 qui implémente l’endpoint adéquat. C’est un cas avancé, inutile pour ton POC.\n\nUCP illustre deux frontières possibles : soit le PSP tokenise et traite lui-même, soit un composant reçoit les données sensibles. Dans le second cas, ce composant — marchand ou PSP — doit être conforme, isolé, authentifié ; le token doit être lié à l’identité du marchand et au checkout, court et idéalement à usage unique. UCP est ici une **spécification/exemple d’architecture**, non une certification.\n\n**Cinématique**\n\n`Assistant → Marchand` : checkout final et approbation utilisateur.  \n`Assistant/Wallet → Merchant API` : token de paiement borné, jamais le PAN.  \n`Merchant API → PSP` : création/confirmation du paiement avec le token.  \n`PSP → réseau/banque → PSP` : résolution sécurisée, autorisation et retour.  \n`PSP → Marchand` : webhook ; le marchand conserve token_id, PaymentIntent et ordre pour réconciliation.\n\n**Geste POC du jour :** ajoute un test de non-régression « no-PAN ». Dans les logs applicatifs, les payloads de commande, erreurs et traces, rejette/masque toute chaîne ressemblant à un numéro de carte ou un CVC. Ne conserve que `payment_token_id`, `payment_intent_id`, `last4` si fourni par le PSP, et les identifiants de corrélation. Ajoute aussi une règle : aucun endpoint agent/MCP ne peut appeler une opération de dé-tokenisation.",
+      "takeaways": [
+        "Le token protège le PAN et réduit le périmètre, mais n’efface pas les responsabilités du marchand.",
+        "Ton POC doit rester token-only : aucun PAN, CVC ou coffre carte dans l’API marchand ou l’agent.",
+        "La dé-tokenisation est une frontière de conformité à réserver au PSP ou à un composant réellement habilité."
+      ],
+      "sources": [
+        {
+          "title": "OpenAI Developers — Accept payments",
+          "url": "https://developers.openai.com/commerce/guides/accept-payments"
+        },
+        {
+          "title": "PCI SSC — EMV Payment Tokens and PCI DSS",
+          "url": "https://www.pcisecuritystandards.org/faqs/1326/"
+        },
+        {
+          "title": "PCI SSC — Outsourced payment processing responsibilities",
+          "url": "https://www.pcisecuritystandards.org/faqs/1092/"
+        },
+        {
+          "title": "UCP — Platform Tokenizer Payment Handler",
+          "url": "https://ucp.dev/2026-04-08/specification/examples/platform-tokenizer-payment-handler/"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Quel élément ne doit jamais transiter dans l’API de ton agent ?",
+          "options": [
+            "Un PaymentIntent ID",
+            "Un token de paiement",
+            "Un PAN ou CVC"
+          ],
+          "answer": 2,
+          "explanation": "L’agent et l’API métier doivent rester hors manipulation de données carte brutes."
+        },
+        {
+          "question": "La tokenisation supprime-t-elle toutes les obligations du marchand ?",
+          "options": [
+            "Oui, toujours",
+            "Non, il garde notamment la responsabilité de ses prestataires et de l’architecture",
+            "Oui, si Stripe est utilisé"
+          ],
+          "answer": 1,
+          "explanation": "Externaliser peut réduire le périmètre technique, mais pas effacer les responsabilités de sécurité et de conformité."
+        },
+        {
+          "question": "Quelle opération doit rester hors d’un endpoint MCP marchand standard ?",
+          "options": [
+            "Lire le catalogue",
+            "Dé-tokeniser une carte",
+            "Créer un panier"
+          ],
+          "answer": 1,
+          "explanation": "La dé-tokenisation expose des données sensibles et doit être isolée chez un acteur réellement conforme."
         }
       ]
     }
