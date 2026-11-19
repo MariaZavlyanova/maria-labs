@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-18T08:26:12.807Z",
+  "updatedAt": "2026-11-19T09:00:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1430,6 +1430,72 @@
           ],
           "answer": 2,
           "explanation": "La déclaration et le consentement accordé sont deux objets distincts."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-19",
+      "category": "fintech",
+      "date": "2026-11-19",
+      "number": 11,
+      "title": "Paiement agentique : autoriser n’est pas capturer, capturer n’est pas émettre",
+      "summary": "Séparer autorisation bancaire, capture des fonds et émission des billets évite les réservations fantômes et les litiges.",
+      "tag": "Authorization · Capture · Fulfillment",
+      "minutes": 4,
+      "content": "Dans une réservation de train, « paiement accepté » peut recouvrir trois choses différentes :\n\n- **Autorisation** : la banque émettrice accepte de bloquer une somme sur le moyen de paiement.\n- **Capture** : le marchand demande l’encaissement de tout ou partie de ce montant.\n- **Émission/fulfillment** : le marchand confirme réellement les billets, avec une référence de réservation.\n\nCes étapes peuvent être quasi simultanées pour un billet immédiatement disponible ; elles restent néanmoins des états distincts. Les séparer rend le système plus sûr lorsqu’une place disparaît, qu’un tarif est refusé par le fournisseur, qu’une émission échoue ou qu’un remboursement est nécessaire.\n\nAvec Stripe, un PaymentIntent en capture manuelle peut atteindre `requires_capture` après autorisation. Le marchand peut alors capturer un montant jusqu’au montant autorisé, puis l’autorisation non capturée finit par expirer selon les règles du moyen de paiement. Pour ton POC, n’adopte pas la capture manuelle par réflexe : commence par un paiement simple, mais modélise les états comme s’ils pouvaient être découplés.\n\nCôté agentique, le même principe protège la délégation. L’agent obtient un checkout et une autorisation de paiement bornée ; le PSP/réseau/banque décide l’autorisation ; le marchand reste responsable de décider si la réservation est vraiment émise. OpenAI confirme que le marchand garde commande, paiement, fulfillment et décision de fraude. Les integrations de payment sheet embarquée restent en **bêta privée** pour certains marketplaces ; ton POC sandbox ne doit pas les présenter comme une fonctionnalité généralement disponible.\n\nAP2 ajoute des reçus pour documenter la décision : le mandat et le reçu de paiement établissent que l’autorisation concernait le checkout donné. Ils ne prouvent pas seuls que le transport a été délivré : il faut le reçu de commande/fulfillment du marchand et, dans ton cas, la référence d’émission du billet.\n\n**Cinématique**\n\n`Assistant → Marchand` : panier, conditions et délégation validés.  \n`Marchand → PSP/wallet → réseau/banque` : autorisation du montant borné.  \n`PSP → Marchand` : résultat d’autorisation.  \n`Marchand → fournisseur ferroviaire` : émission effective ou échec de réservation.  \n`Marchand → PSP` : capture si émission confirmée, ou annulation/remboursement selon le scénario.  \n`Marchand → Assistant` : statut final et référence de billets ; l’agent ne voit jamais la carte.\n\n**Geste POC du jour :** ajoute à l’ordre `payment_status` et `fulfillment_status` séparés. Exemple : `authorized / captured / canceled / refunded` d’un côté ; `pending / issued / failed / canceled` de l’autre. Interdis la réponse `order_confirmed` tant que `fulfillment_status !== issued`. Simule le cas critique : paiement autorisé, émission échouée ; ton workflow doit annuler l’autorisation ou rembourser, puis envoyer un événement explicite `order_failed_after_payment`.",
+      "takeaways": [
+        "L’autorisation bancaire, la capture et l’émission des billets sont des faits distincts.",
+        "Le marchand décide la commande et le fulfillment ; l’agent n’infère pas un billet émis depuis un paiement réussi.",
+        "Deux machines d’état — paiement et émission — rendent les annulations et remboursements testables."
+      ],
+      "sources": [
+        {
+          "title": "Stripe API — Capture a PaymentIntent",
+          "url": "https://docs.stripe.com/api/payment_intents/capture"
+        },
+        {
+          "title": "OpenAI Developers — Accept payments",
+          "url": "https://developers.openai.com/commerce/guides/accept-payments"
+        },
+        {
+          "title": "OpenAI Developers — ChatGPT payment sheet",
+          "url": "https://developers.openai.com/plugins/build/chatgpt-ui"
+        },
+        {
+          "title": "AP2 — Agentic Payment Protocol v0.2",
+          "url": "https://ap2-protocol.org/ap2/specification/"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Quel état décrit le mieux une banque qui a accepté de bloquer des fonds sans encaissement définitif ?",
+          "options": [
+            "Autorisé",
+            "Émis",
+            "Remboursé"
+          ],
+          "answer": 0,
+          "explanation": "L’autorisation réserve ou valide les fonds ; la capture correspond à l’encaissement."
+        },
+        {
+          "question": "Quand le POC doit-il annoncer que les billets sont confirmés ?",
+          "options": [
+            "Dès la création du PaymentIntent",
+            "Après l’émission réussie par le marchand/fournisseur",
+            "Dès que l’agent a construit le panier"
+          ],
+          "answer": 1,
+          "explanation": "Le paiement peut être autorisé alors que l’émission échoue ; le statut de fulfillment doit faire foi."
+        },
+        {
+          "question": "Que faire si le paiement est autorisé mais que l’émission des billets échoue ?",
+          "options": [
+            "Marquer la commande confirmée",
+            "Conserver l’autorisation indéfiniment",
+            "Annuler l’autorisation ou rembourser selon le flux"
+          ],
+          "answer": 2,
+          "explanation": "Le workflow doit annuler ou compenser le paiement et publier un échec explicite de commande."
         }
       ]
     }
