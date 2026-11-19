@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-19T09:00:00+01:00",
+  "updatedAt": "2026-11-19T09:53:03+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1496,6 +1496,64 @@
           ],
           "answer": 2,
           "explanation": "Le workflow doit annuler ou compenser le paiement et publier un échec explicite de commande."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-19",
+      "category": "cyber",
+      "date": "2026-11-19",
+      "number": 19,
+      "title": "Passkeys FIDO2 : pourquoi elles résistent au phishing mieux qu'un code MFA",
+      "summary": "Comprendre les clés publiques/privées, le challenge WebAuthn et la liaison au domaine, puis les choix de déploiement Entra ID.",
+      "tag": "FIDO2 · WebAuthn · MFA",
+      "minutes": 4,
+      "content": "## Pourquoi un code MFA à six chiffres reste vulnérable au phishing\n\nImagine un collaborateur qui reçoit un faux lien vers le portail SSO. Il saisit son mot de passe et le code temporaire de son application MFA. L'attaquant transmet immédiatement ces informations au vrai fournisseur d'identité : le code est valide, et la connexion peut réussir.\n\n**Le MFA ne suffit donc pas toujours à empêcher le phishing.** La différence avec une passkey FIDO2 est que celle-ci est liée cryptographiquement au véritable site d'authentification.\n\n## 1. Le mécanisme FIDO2/WebAuthn\n\nLors de l'enregistrement, l'authentificateur (clé physique, appareil ou gestionnaire de passkeys) crée une paire de clés asymétriques :\n- **Clé privée** : conservée par l'authentificateur ; elle ne doit pas être envoyée au serveur.\n- **Clé publique** : enregistrée par le fournisseur d'identité, par exemple Entra ID.\n\nÀ la connexion, l'IdP envoie un défi aléatoire (*challenge*). Le navigateur vérifie l'origine du site et l'authentificateur signe le défi avec la clé privée. L'IdP vérifie la signature avec la clé publique.\n\n**Séquence simplifiée :**\n\n1. Utilisateur → navigateur : ouverture de la page de connexion.\n2. IdP → navigateur : défi WebAuthn.\n3. Navigateur → authentificateur : demande de signature liée à l'origine du site.\n4. Authentificateur → IdP : réponse signée, après vérification locale appropriée.\n5. IdP : vérification cryptographique, puis établissement de la connexion.\n\nSur un domaine de phishing, le navigateur ne peut pas obtenir une assertion WebAuthn valide pour le domaine légitime. C'est la résistance au phishing par *verifier name binding* décrite par le NIST.\n\n## 2. Passkey synchronisée ou liée à un appareil ?\n\n| Type | Où se trouve la clé privée ? | Conséquence |\n|---|---|---|\n| **Device-bound** | Sur un appareil ou une clé physique déterminée | Contrôle renforcé de l'emplacement de la clé |\n| **Synced** | Synchronisée de manière chiffrée via un fournisseur de passkeys | Utilisation plus simple sur plusieurs appareils, avec dépendance à la sécurité du fournisseur |\n\nLes deux peuvent être résistantes au phishing, mais leur modèle de sécurité et leurs garanties d'attestation diffèrent. Microsoft Entra ID permet de définir des profils FIDO2 distincts selon les groupes et les types de passkeys.\n\n## 3. Exemple d'entreprise et pièges\n\nUne entreprise pourrait imposer une passkey FIDO2 liée à un appareil pour les administrateurs d'identité, et autoriser des passkeys synchronisées pour certains salariés, après analyse de risque.\n\nPour l'architecte IAM, trois contrôles restent essentiels : **l'enrôlement initial** (qui peut enregistrer une nouvelle clé ?), **la récupération** (que faire si l'appareil est perdu ?) et **les méthodes de secours** (une méthode moins résistante au phishing pourrait-elle contourner la politique ?).\n\nEnfin, FIDO2 protège la cérémonie d'authentification, mais ne bloque pas à lui seul le vol d'une session déjà établie ni les consentements OAuth malveillants étudiés hier.\n\n**Termes à retenir :** WebAuthn (API d'authentification du navigateur), *challenge* (défi aléatoire), *origin binding* (liaison au véritable domaine).",
+      "takeaways": [
+        "Un code MFA peut être relayé par un faux site ; FIDO2 lie la preuve cryptographique au véritable domaine.",
+        "Une passkey utilise une clé privée conservée par l'authentificateur et une clé publique enregistrée chez l'IdP.",
+        "La sécurité dépend aussi de l'enrôlement, des procédures de récupération et des méthodes de secours."
+      ],
+      "sources": [
+        {
+          "title": "NIST SP 800-63B — Digital Identity Guidelines",
+          "url": "https://pages.nist.gov/800-63-4/sp800-63b.html"
+        },
+        {
+          "title": "Microsoft Learn — How to enable passkeys (FIDO2) in Microsoft Entra ID",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-passkeys-fido2"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Pourquoi une passkey FIDO2 résiste-t-elle mieux au phishing qu'un code OTP ?",
+          "options": [
+            "Elle expire après cinq secondes",
+            "La preuve cryptographique est liée au véritable domaine",
+            "Elle transmet le mot de passe sous forme chiffrée"
+          ],
+          "answer": 1,
+          "explanation": "Le navigateur et l'authentificateur lient l'assertion au site légitime."
+        },
+        {
+          "question": "Quelle clé l'IdP conserve-t-il pour vérifier une connexion WebAuthn ?",
+          "options": [
+            "La clé publique",
+            "La clé privée",
+            "Le code MFA"
+          ],
+          "answer": 0,
+          "explanation": "L'IdP vérifie la signature avec la clé publique ; la clé privée reste dans l'authentificateur."
+        },
+        {
+          "question": "Quel risque faut-il examiner même avec FIDO2 ?",
+          "options": [
+            "La taille des JWT uniquement",
+            "La couleur du portail",
+            "Les procédures de récupération et méthodes de secours"
+          ],
+          "answer": 2,
+          "explanation": "Un mécanisme de récupération faible peut contourner une authentification forte."
         }
       ]
     }
