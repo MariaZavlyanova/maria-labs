@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-19T09:53:03+01:00",
+  "updatedAt": "2026-11-20T09:00:37+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1554,6 +1554,60 @@
           ],
           "answer": 2,
           "explanation": "Un mécanisme de récupération faible peut contourner une authentification forte."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-20",
+      "category": "cyber",
+      "date": "2026-11-20",
+      "number": 20,
+      "title": "Okta : pourquoi une politique MFA ne doit pas être identique pour toutes les applications",
+      "summary": "Comprendre les app sign-in policies d'Okta et le risque de modifier une politique partagée.",
+      "tag": "Okta · Accès conditionnel",
+      "minutes": 4,
+      "content": "## Le problème : un MFA réussi suffit-il pour accéder à toutes les applications ?\n\nImagine une collaboratrice qui se connecte à son portail Okta avec un mot de passe et un second facteur. Elle ouvre ensuite une application de notes de frais, puis une console d'administration sensible.\n\nDoit-on appliquer exactement les mêmes exigences d'authentification aux deux applications ? **Non.** Dans Okta Identity Engine, les **app sign-in policies** permettent de définir des exigences propres à l'accès à une application.\n\n## 1. Qu'est-ce qu'une app sign-in policy ?\n\nC'est une politique évaluée lorsque l'utilisateur tente d'accéder à une application. Ses règles peuvent tenir compte, selon la configuration, de l'appartenance à un groupe, de la zone IP, du niveau de risque et d'autres signaux. Elles définissent les conditions d'authentification à satisfaire pour ouvrir l'application.\n\nUne organisation peut utiliser une politique distincte par application ou partager une même politique entre plusieurs applications ayant des besoins similaires.\n\n**Exemple fictif :** l'application de notes de frais autorise une authentification multifacteur standard, tandis qu'une console d'administration exige un authentificateur résistant au phishing et des conditions supplémentaires. Les capacités exactes dépendent des options et authentificateurs configurés.\n\n## 2. La cinématique simplifiée\n\n1. L'utilisateur ouvre une application intégrée à Okta.\n2. Okta identifie la politique de connexion associée à cette application.\n3. Okta évalue les règles applicables : groupe, contexte de connexion, risque et exigences d'authentification.\n4. Si les conditions ne sont pas encore satisfaites, Okta peut demander une authentification supplémentaire ; si elles ne peuvent pas être satisfaites, l'accès est refusé.\n5. Lorsque les conditions sont satisfaites, le flux d'accès à l'application se poursuit.\n\n**Point important :** la politique de connexion ne remplace pas les permissions métier dans l'application. Elle contrôle les conditions d'accès, pas nécessairement le droit de consulter chaque dossier ou de modifier chaque ressource.\n\n## 3. Le piège de la politique partagée\n\nDans Okta Identity Engine, les nouvelles applications (hors applications de service API) commencent avec une politique partagée par défaut. Modifier cette politique peut donc affecter **plusieurs applications existantes et futures**, et pas seulement celle que l'on vient d'intégrer.\n\nExemple : une équipe renforce la politique par défaut pour sécuriser une application critique. Sans analyser les autres applications associées, elle risque d'introduire des demandes d'authentification inattendues ou de bloquer certaines populations.\n\nInversement, assouplir cette politique pour résoudre un problème ponctuel peut affaiblir la protection d'autres applications.\n\n## 4. Le réflexe d'architecture IAM\n\nAvant de modifier une règle Okta, identifier **les applications auxquelles la politique est affectée**, les groupes concernés, les conditions d'accès attendues et les scénarios de test. Prévoir aussi un chemin de récupération pour éviter de bloquer l'administration.\n\nTrois termes à retenir : **app sign-in policy** (politique d'accès à une application), **rule** (condition et exigences associées), **shared default policy** (politique partagée par défaut).\n\nCette logique complète notre leçon sur les passkeys : FIDO2 est une méthode d'authentification ; une politique d'application détermine **quand et pour qui** cette méthode doit être exigée.",
+      "takeaways": [
+        "Une app sign-in policy définit les conditions d'authentification propres à une application.",
+        "Une politique partagée peut affecter plusieurs applications simultanément.",
+        "Les conditions de connexion ne remplacent pas les autorisations métier."
+      ],
+      "sources": [
+        {
+          "title": "Okta Identity Engine — App sign-in policies",
+          "url": "https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-app-sign-on-policies.htm"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Quel est le rôle principal d'une app sign-in policy ?",
+          "options": [
+            "Définir les conditions d'authentification à une application",
+            "Créer les comptes RH",
+            "Attribuer les droits sur chaque document"
+          ],
+          "answer": 0,
+          "explanation": "Elle vérifie les conditions requises pour accéder à l'application."
+        },
+        {
+          "question": "Quel est le risque d'une modification de la politique partagée par défaut ?",
+          "options": [
+            "Elle supprime tous les tokens",
+            "Elle peut affecter plusieurs applications",
+            "Elle désactive automatiquement le MFA"
+          ],
+          "answer": 1,
+          "explanation": "Les applications associées à la politique partagent ses règles."
+        },
+        {
+          "question": "Une app sign-in policy remplace-t-elle les autorisations métier ?",
+          "options": [
+            "Oui, toujours",
+            "Seulement avec SAML",
+            "Non, les permissions métier restent distinctes"
+          ],
+          "answer": 2,
+          "explanation": "Les contrôles de connexion et les permissions sur les ressources sont deux niveaux distincts."
         }
       ]
     }
