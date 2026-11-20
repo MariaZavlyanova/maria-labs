@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-20T09:00:37+01:00",
+  "updatedAt": "2026-11-20T09:00:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1608,6 +1608,72 @@
           ],
           "answer": 2,
           "explanation": "Les contrôles de connexion et les permissions sur les ressources sont deux niveaux distincts."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-20",
+      "category": "fintech",
+      "date": "2026-11-20",
+      "number": 12,
+      "title": "Paiement agentique : le paiement n’est pas la fin de la commande",
+      "summary": "Remboursement, annulation et litige doivent être des événements métier traçables, pas de simples notes dans l’assistant.",
+      "tag": "Post-paiement · Remboursement · Litige",
+      "minutes": 4,
+      "content": "Une fois les billets émis, l’agent peut encore recevoir une demande : « annule le billet de Paul », « où en est mon remboursement ? », ou « je ne reconnais pas ce paiement ». Le paiement agentique ne s’arrête donc pas au `payment_succeeded` : le marchand doit gérer tout le cycle post-achat.\n\nTrois opérations doivent rester distinctes :\n\n- **Annulation** : le marchand met fin à une commande ou réservation selon ses règles ; si les fonds ne sont pas encore capturés, il peut annuler l’autorisation.\n- **Remboursement** : le marchand renvoie une somme après un paiement capturé. Il peut être total ou partiel.\n- **Litige/chargeback** : le titulaire conteste le paiement auprès de sa banque. Le PSP et le réseau ouvrent un processus séparé, avec des délais et des preuves à fournir.\n\nL’assistant peut demander et afficher ces opérations, mais il n’est pas l’autorité qui décide si un billet est remboursable. Le marchand garde ses règles tarifaires, ses obligations légales, son support et sa décision de fraude. OpenAI indique d’ailleurs que l’entreprise gère commande, fulfillment, support et risque sur sa propre stack.\n\nUCP propose un modèle très utile pour ne pas écraser l’historique : l’ordre est un état courant, mais les ajustements sont un journal **append-only**. Un remboursement, une annulation, un crédit ou un litige est un événement distinct, daté, avec son montant, son statut et, si besoin, la ligne de commande concernée. Pour des billets de groupe, cela évite une erreur classique : remplacer le total de 1 200 € par 1 080 € sans pouvoir expliquer plus tard pourquoi 120 € ont été remboursés.\n\nAP2 apporte une couche de preuve pour le litige : checkout mandate, payment mandate et leurs receipts permettent de reconstruire ce que l’utilisateur a approuvé et ce que les vérificateurs ont accepté. Mais ces preuves ne remplacent pas les éléments commerciaux : conditions tarifaires présentées, référence de billet, preuve d’émission, demande d’annulation et confirmation de remboursement. AP2 reste une **spécification** ; le mécanisme de litige concret dépend du PSP, du réseau et du marchand.\n\n**Cinématique**\n\n`Utilisateur → Assistant` : demande l’annulation du billet de Paul.  \n`Assistant → Marchand` : requête d’opération post-achat avec `order_id` et ligne concernée.  \n`Marchand` : vérifie identité, politique tarifaire, état d’émission et éligibilité.  \n`Marchand → PSP → réseau/banque` : annulation d’autorisation ou remboursement si accepté.  \n`Marchand → Assistant` : événement d’ajustement avec montant et statut ; jamais une promesse implicite de remboursement.\n\n**Geste POC du jour :** ajoute une collection `adjustments` append-only à l’ordre : `id`, `type` (`cancellation`, `refund`, `dispute`), `status` (`pending`, `completed`, `failed`), `amount_minor`, `currency`, `line_item_ids`, `reason`, `occurred_at`, `provider_ref`. Teste : remboursement partiel du billet d’une personne, puis replay du webhook PSP ; l’ajustement doit rester unique et le total remboursé doit être recalculé, pas écrasé.",
+      "takeaways": [
+        "Annulation, remboursement et litige sont des processus distincts, avec des acteurs et temporalités différents.",
+        "Les ajustements append-only conservent l’explication financière d’une commande après son paiement.",
+        "Les mandats AP2 aident à établir le consentement, mais les preuves commerciales restent nécessaires au traitement d’un litige."
+      ],
+      "sources": [
+        {
+          "title": "OpenAI Developers — Accept payments",
+          "url": "https://developers.openai.com/commerce/guides/accept-payments"
+        },
+        {
+          "title": "UCP — Order Capability",
+          "url": "https://ucp.dev/2026-04-08/specification/order/"
+        },
+        {
+          "title": "AP2 — Agentic Payment Protocol v0.2",
+          "url": "https://ap2-protocol.org/ap2/specification/"
+        },
+        {
+          "title": "Stripe API — Update a dispute",
+          "url": "https://docs.stripe.com/api/disputes/update"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Quelle affirmation distingue correctement annulation et remboursement ?",
+          "options": [
+            "Elles sont toujours identiques",
+            "L’annulation peut éviter la capture ; le remboursement intervient après paiement capturé",
+            "Le remboursement est décidé par l’agent seul"
+          ],
+          "answer": 1,
+          "explanation": "Selon l’état du paiement, le marchand annule l’autorisation ou crée un remboursement."
+        },
+        {
+          "question": "Pourquoi conserver des ajustements append-only ?",
+          "options": [
+            "Pour pouvoir expliquer chaque mouvement financier sans effacer l’historique",
+            "Pour supprimer les références PSP",
+            "Pour remplacer les webhooks"
+          ],
+          "answer": 0,
+          "explanation": "Un journal d’événements permet l’audit, la réconciliation et la gestion de remboursements partiels."
+        },
+        {
+          "question": "Que prouve principalement un mandat AP2 lors d’un litige ?",
+          "options": [
+            "Que le billet a été émis",
+            "Ce qui a été approuvé et vérifié pour le checkout/paiement",
+            "Que le marchand doit rembourser"
+          ],
+          "answer": 1,
+          "explanation": "Les mandats et receipts documentent l’autorisation ; les règles commerciales déterminent ensuite l’issue du remboursement."
         }
       ]
     }
