@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-23T09:00:00+01:00",
+  "updatedAt": "2026-11-23T10:09:43+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1740,6 +1740,64 @@
           ],
           "answer": 0,
           "explanation": "Un signal de risque ne peut jamais lever les bornes du token ni les contrôles de rejeu."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-23",
+      "category": "cyber",
+      "date": "2026-11-23",
+      "number": 21,
+      "title": "SCIM 2.0 : le SSO connecte, mais qui crée et supprime les comptes ?",
+      "summary": "Comprendre le provisioning SCIM, ses appels API et le risque des comptes SaaS oubliés après un départ.",
+      "tag": "SCIM · Provisioning",
+      "minutes": 4,
+      "content": "## 1. Pourquoi le SSO ne suffit pas\n\nUne application peut accepter une connexion via Okta ou Microsoft Entra ID sans disposer d'un compte local pour cette personne. Le **SSO** répond à la question « qui se connecte ? » ; le **provisioning** répond à « quel compte créer, modifier ou désactiver dans l'application ? ».\n\nC'est le rôle de **SCIM 2.0** (*System for Cross-domain Identity Management*), un standard HTTP défini notamment par les RFC 7643 (schéma) et 7644 (protocole). Il évite de développer une API spécifique pour chaque SaaS.\n\n## 2. Une cinématique concrète\n\nImaginons un outil de gestion de projets connecté à un annuaire d'entreprise.\n\n1. Le système RH signale l'arrivée de Léa ; son identité et ses attributs sont synchronisés dans l'annuaire.\n2. Le service de provisioning identifie que Léa doit accéder au SaaS.\n3. Il appelle l'API SCIM du SaaS : `POST /Users`, avec un objet JSON contenant par exemple `userName`, `name` et `active: true`.\n4. Lors d'un changement de service, il peut envoyer un `PATCH /Users/{id}` pour actualiser des attributs ou appartenances.\n5. Au départ, il peut demander `active: false` pour désactiver le compte, selon le comportement pris en charge par le fournisseur.\n\nLe SaaS conserve son propre identifiant utilisateur SCIM. Le moteur de provisioning doit faire correctement le **matching** entre l'identité source et le compte cible pour éviter de créer un doublon.\n\n## 3. Pourquoi c'est un sujet de cybersécurité\n\nLe principal risque n'est pas seulement l'échec de création du compte : c'est surtout **l'échec du déprovisioning**. Un salarié parti peut conserver un compte local actif si la synchronisation échoue ou si le SaaS ne traite pas correctement la désactivation.\n\nAutres points à contrôler :\n\n- **Portée :** quels utilisateurs et groupes sont réellement inclus dans la synchronisation ?\n- **Mapping :** quels attributs font foi, et que se passe-t-il lorsqu'ils changent ?\n- **Sécurité de l'API :** qui possède le token technique autorisant la création et la désactivation de comptes ? SCIM ne définit pas à lui seul la méthode d'authentification ; l'API doit être protégée.\n- **Observabilité :** existe-t-il des journaux, alertes et procédures de reprise après erreur ?\n\nSCIM n'est pas une méthode de SSO, et désactiver un compte via SCIM ne garantit pas la révocation immédiate de toutes les sessions déjà ouvertes.\n\n## 4. Le réflexe d'architecture\n\nLors de l'intégration d'un SaaS à Okta ou Entra ID, demander séparément : « Comment les utilisateurs se connectent-ils ? » et « Comment leurs comptes sont-ils créés, mis à jour et désactivés ? ».\n\n**Trois termes :** *SCIM endpoint* (API de gestion des identités), *attribute mapping* (correspondance des attributs), *deprovisioning* (désactivation ou retrait du compte).",
+      "takeaways": [
+        "Le SSO authentifie ; SCIM gère le cycle de vie des comptes applicatifs.",
+        "SCIM standardise les opérations HTTP de création, mise à jour et désactivation.",
+        "Le déprovisioning doit être surveillé et vérifié dans le SaaS cible."
+      ],
+      "sources": [
+        {
+          "title": "Microsoft Learn — What is app provisioning in Microsoft Entra ID?",
+          "url": "https://learn.microsoft.com/en-us/entra/identity/app-provisioning/user-provisioning"
+        },
+        {
+          "title": "IETF — RFC 7644 SCIM Protocol",
+          "url": "https://www.rfc-editor.org/rfc/rfc7644"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Quelle opération relève de SCIM plutôt que du SSO ?",
+          "options": [
+            "Authentifier Léa avec une passkey",
+            "Créer son compte dans le SaaS",
+            "Afficher la page de connexion"
+          ],
+          "answer": 1,
+          "explanation": "SCIM gère les identités applicatives ; le SSO assure la connexion."
+        },
+        {
+          "question": "Quelle requête SCIM sert généralement à créer un utilisateur ?",
+          "options": [
+            "POST /Users",
+            "GET /Sessions",
+            "DELETE /Tokens"
+          ],
+          "answer": 0,
+          "explanation": "POST /Users crée une ressource utilisateur SCIM."
+        },
+        {
+          "question": "Quel risque persiste si le déprovisioning échoue ?",
+          "options": [
+            "Le MFA devient obligatoire",
+            "Le navigateur perd son certificat",
+            "Un ancien compte SaaS reste actif"
+          ],
+          "answer": 2,
+          "explanation": "Une désactivation non propagée laisse potentiellement un accès local utilisable."
         }
       ]
     }
