@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-24T09:00:00+01:00",
+  "updatedAt": "2026-11-24T08:11:33Z",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1872,6 +1872,60 @@
           ],
           "answer": 1,
           "explanation": "L’agent ne détient qu’un droit encadré ; le marchand contrôle panier, prix, état et exécution."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-24",
+      "category": "cyber",
+      "date": "2026-11-24",
+      "number": 22,
+      "title": "OAuth Token Exchange : un jeton différent pour chaque API",
+      "summary": "Comment transmettre une délégation entre services sans réutiliser le même jeton partout.",
+      "tag": "OAuth 2.0",
+      "minutes": 4,
+      "content": "## Le problème\nImagine une assistante interne qui consulte les documents RH au nom d'une collaboratrice. Elle reçoit un access token destiné à sa propre API. Peut-elle simplement le transmettre à l'API documentaire ? Non : celle-ci doit vérifier que le jeton lui est destiné. Utiliser un compte technique doté de droits globaux serait également risqué, car les droits de la collaboratrice pourraient être contournés.\n\n## Le mécanisme\nOAuth Token Exchange (RFC 8693, janvier 2020) permet de demander un nouveau jeton à un serveur d'autorisation jouant le rôle de Security Token Service (STS). Le client présente un subject_token et indique la ressource ou l'audience souhaitée ainsi que les permissions demandées. Un actor_token peut aussi identifier l'acteur. Le serveur vérifie les preuves et applique ses politiques avant de décider d'émettre un jeton.\n\n## Exemple fictif\n1. La collaboratrice appelle l'assistant avec un jeton destiné à l'assistant.\n2. L'assistant authentifié demande au STS un jeton pour l'API documentaire, avec un droit de lecture.\n3. Le STS vérifie que cette délégation est autorisée et émet, si les conditions sont satisfaites, un nouveau jeton.\n4. L'API documentaire valide le nouveau jeton et contrôle les droits sur le document demandé.\n\nDans un profil JWT de délégation, sub peut identifier la collaboratrice et act l'assistant. Ce dernier reste identifiable comme acteur distinct. L'impersonation, en revanche, ne distingue pas nécessairement l'acteur du sujet auprès de la ressource.\n\n## Les pièges\nL'échange ne garantit pas à lui seul une réduction des permissions : il faut configurer les politiques. La révocation du jeton initial ne révoque pas automatiquement le nouveau. Il faut aussi vérifier la compatibilité des serveurs d'autorisation et leur relation de confiance. Dans une architecture Entra/Okta, la présence d'OAuth des deux côtés ne suffit pas à garantir l'interopérabilité.\n\n## Réflexe d'architecture\nDéfinir les couples client/ressource autorisés, les scopes maximaux, la durée des jetons et les preuves d'audit. Tester qu'une demande d'accès à une ressource non autorisée est refusée.\n\nTrois termes : STS (service d'émission de jetons), audience (destinataire prévu), actor (entité agissant pour le sujet).",
+      "takeaways": [
+        "Un jeton destiné à une API ne doit pas être accepté par une autre audience.",
+        "Le STS décide si un nouveau jeton peut être émis.",
+        "La délégation et la révocation nécessitent des politiques explicites."
+      ],
+      "sources": [
+        {
+          "title": "IETF — RFC 8693, OAuth 2.0 Token Exchange",
+          "url": "https://www.rfc-editor.org/rfc/rfc8693"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Un jeton destiné à l'assistant suffit-il pour appeler l'API documentaire ?",
+          "options": [
+            "Oui, s'il est signé",
+            "Non, il faut un jeton accepté pour cette audience",
+            "Oui, si le MFA a réussi"
+          ],
+          "answer": 1,
+          "explanation": "La signature ne remplace pas le contrôle de l'audience."
+        },
+        {
+          "question": "Qui décide d'émettre le nouveau jeton ?",
+          "options": [
+            "Le STS selon ses politiques",
+            "Le navigateur",
+            "L'utilisateur seul"
+          ],
+          "answer": 0,
+          "explanation": "Le serveur d'autorisation valide les preuves et les politiques."
+        },
+        {
+          "question": "La révocation du jeton initial révoque-t-elle automatiquement le nouveau ?",
+          "options": [
+            "Toujours",
+            "Seulement si JWT",
+            "Non, pas par défaut"
+          ],
+          "answer": 2,
+          "explanation": "La propagation de révocation dépend de l'implémentation."
         }
       ]
     }
