@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-23T10:09:43+01:00",
+  "updatedAt": "2026-11-24T09:00:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1798,6 +1798,80 @@
           ],
           "answer": 2,
           "explanation": "Une désactivation non propagée laisse potentiellement un accès local utilisable."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-24",
+      "category": "fintech",
+      "date": "2026-11-24",
+      "number": 14,
+      "title": "Paiement agentique : révoquer un droit, pas une carte",
+      "summary": "Une délégation de paiement doit pouvoir expirer ou être annulée sans révéler ni supprimer le moyen de paiement sous-jacent.",
+      "tag": "Délégation · Révocation · Token",
+      "minutes": 4,
+      "content": "## Veille protocoles — statut au 24 novembre\n\n- **ACP / ChatGPT : beta privée.** Le checkout embarqué avec la feuille de paiement ChatGPT est réservé à certains marketplaces. Son flux demande au serveur de vérifier le token, d’être idempotent et de conserver le reçu autoritaire.\n- **Stripe : déploiement progressif.** Stripe présente ses Shared Payment Tokens (SPT) comme limitables par marchand, montant et durée, révocables et observables par webhook. L’extension aux tokens réseau Visa/Mastercard et BNPL est annoncée comme en cours de déploiement, pas comme une disponibilité uniforme pour tout POC.\n- **AP2 : spécification v0.2.** Un Payment Mandate peut avoir une expiration, des fenêtres d’exécution et des contraintes. La spécification recommande un mécanisme de gestion des mandats actifs.\n- **UCP : spécification publiée.** Le checkout prévoit annulation, expiration, protection contre le rejeu et état autoritaire retourné par le business.\n\n## Le concept : révoquer une permission n’est pas supprimer une carte\n\nDans ton POC, ne donne jamais une carte à l’agent. Il reçoit au plus une **permission bornée** de payer une commande : un token ou un mandat relié au checkout, avec un marchand, une devise, un plafond, une expiration et un usage autorisé.\n\nLa **révocation** consiste à rendre cette permission inutilisable avant son expiration : l’utilisateur annule l’achat, le panier change, un risque fraude apparaît, ou un organisateur retire un participant. Elle ne consiste pas à supprimer le moyen de paiement du wallet ou du coffre Stripe.\n\nUn `payment_token_id` doit donc avoir son propre cycle de vie : `active → consumed | revoked | expired`. Garde l’état côté marchand ; ne déduis pas « actif » parce qu’un agent le présente encore. À l’exécution, vérifie atomiquement : état actif, expiration, checkout associé, montant/devise/bénéficiaire, puis marque-le consommé. Une deuxième tentative doit échouer.\n\n## Cinématique\n\n`Assistant → Marchand` : l’agent crée ou modifie le panier ; le marchand calcule prix et disponibilité.  \n`Utilisateur → wallet / surface de confiance` : il approuve une délégation précise ; le wallet crée un token borné.  \n`Assistant → Marchand → PSP/wallet → réseau/banque` : le marchand vérifie le token et demande l’autorisation ; l’agent n’accède jamais au numéro de carte.  \n`Marchand → Assistant` : reçu ou refus, après webhook signé du PSP. Si le token a été révoqué, expiré ou consommé, le marchand refuse avant de lancer un paiement.\n\nMCP expose ici des outils pour le catalogue et le checkout. Il n’apporte ni coffre PCI, ni révocation, ni conformité : le marchand demeure source de vérité du panier et du prix, et OpenAI n’est pas Merchant of Record.\n\n## Geste POC prioritaire\n\nAjoute deux endpoints serveur :\n\n    POST /payment-delegations/{id}/revoke\n    POST /orders/{id}/pay   → refuse si delegation.status ≠ active\n\nTest de sécurité : crée un token de 120,00 € pour le marchand train-demo, révoque-le, puis rejoue la même demande de paiement. Résultat attendu : `409 delegation_revoked`, aucun PaymentIntent Stripe créé, un événement d’audit avec `delegation_id`, `checkout_id`, motif et horodatage.",
+      "takeaways": [
+        "Révoquer le droit de payer ne veut pas dire supprimer ni exposer la carte du client.",
+        "Le marchand doit conserver et vérifier le cycle de vie du token de façon atomique.",
+        "Expiration, révocation, usage unique et webhook signé complètent le consentement utilisateur."
+      ],
+      "sources": [
+        {
+          "title": "OpenAI Developers — Add UI to your MCP server",
+          "url": "https://developers.openai.com/plugins/build/chatgpt-ui"
+        },
+        {
+          "title": "Stripe — Introducing our agentic commerce solutions",
+          "url": "https://stripe.com/blog/introducing-our-agentic-commerce-solutions"
+        },
+        {
+          "title": "Stripe — Supporting additional payment methods for agentic commerce",
+          "url": "https://stripe.com/blog/supporting-additional-payment-methods-for-agentic-commerce"
+        },
+        {
+          "title": "AP2 — Payment Mandate",
+          "url": "https://ap2-protocol.org/ap2/payment_mandate/"
+        },
+        {
+          "title": "AP2 — Implementation Considerations",
+          "url": "https://ap2-protocol.org/ap2/implementation_considerations/"
+        },
+        {
+          "title": "UCP — Checkout specification",
+          "url": "https://ucp.dev/latest/specification/checkout/"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Que doit faire le marchand lorsqu’un token de paiement a été révoqué ?",
+          "options": [
+            "Le transmettre quand même au PSP",
+            "Refuser la tentative avant de créer le paiement",
+            "Demander à l’agent de le régénérer seul"
+          ],
+          "answer": 1,
+          "explanation": "La révocation rend la délégation inutilisable ; le marchand doit bloquer le flux avant toute tentative de paiement."
+        },
+        {
+          "question": "Quel état protège contre un second débit après un premier usage valide ?",
+          "options": [
+            "active",
+            "consumed",
+            "expired"
+          ],
+          "answer": 1,
+          "explanation": "Après consommation atomique, une nouvelle tentative avec le même token doit être rejetée."
+        },
+        {
+          "question": "Qui reste source de vérité pour l’état d’un token et du checkout ?",
+          "options": [
+            "L’agent MCP",
+            "Le marchand côté serveur",
+            "L’interface conversationnelle"
+          ],
+          "answer": 1,
+          "explanation": "L’agent ne détient qu’un droit encadré ; le marchand contrôle panier, prix, état et exécution."
         }
       ]
     }
