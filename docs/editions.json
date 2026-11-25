@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-25T09:00:00+01:00",
+  "updatedAt": "2026-11-25T08:55:22Z",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -2000,6 +2000,60 @@
           ],
           "answer": 1,
           "explanation": "Le rapprochement sur les références et états autoritaires évite de décider depuis un affichage ou un événement hors ordre."
+        }
+      ]
+    },
+    {
+      "id": "cyber-2026-11-25",
+      "category": "cyber",
+      "date": "2026-11-25",
+      "number": 23,
+      "title": "DPoP : pourquoi voler un access token ne suffit plus",
+      "summary": "Associer un jeton OAuth à une clé cryptographique pour limiter sa réutilisation après une fuite.",
+      "tag": "OAuth 2.0 · Sécurité des tokens",
+      "minutes": 4,
+      "content": "## 1. Le problème du bearer token\nHier, Token Exchange nous a permis de distinguer les audiences des API. Mais que se passe-t-il si un jeton destiné à la bonne API fuit dans un journal technique ? Un bearer token valide peut être utilisé par son détenteur. La signature de l'émetteur ne prouve pas que celui qui le présente est le client initial.\n\nDPoP (Demonstrating Proof of Possession), standardisé en septembre 2023 par la RFC 9449, ajoute une preuve de possession de clé au niveau HTTP.\n\n## 2. La cinématique\nLe client génère une paire de clés. Lors de la demande de token, il fournit une preuve signée. Le serveur d'autorisation associe le jeton à la clé publique. À chaque appel API, le client joint une nouvelle preuve JWT signée avec sa clé privée. L'API vérifie le jeton, la preuve et leur association.\n\n```http\nGET /documents HTTP/1.1\nHost: api.example.com\nAuthorization: DPoP <access_token>\nDPoP: <preuve_JWT_signee>\n```\n\nLa preuve contient notamment htm (méthode HTTP), htu (URI sans query ni fragment), iat (date de création), jti (identifiant unique) et ath (empreinte du jeton lors de l'appel API). Un JWT d'accès peut porter cnf.jkt, l'empreinte de la clé publique associée. La clé privée ne transite pas.\n\n## 3. Exemple d'entreprise\nUne application mobile de maintenance consulte des ordres de travail. Un jeton apparaît accidentellement dans un outil de diagnostic. Si l'API impose DPoP et que la clé privée reste protégée, le jeton seul ne suffit pas à fabriquer une nouvelle preuve valide. Cela réduit l'impact de la fuite, sans dispenser de révoquer le jeton et de corriger la journalisation.\n\n## 4. Les limites et le réflexe d'architecture\nDPoP ne remplace ni HTTPS ni les contrôles métier. Si le client est compromis et que du code malveillant peut utiliser sa clé, la protection est affaiblie. La preuve ne signe pas tout le corps HTTP. Il faut aussi gérer la fraîcheur des preuves et le risque de rejeu, éventuellement avec un nonce serveur.\n\nDans une architecture Okta ou Entra, vérifier le support de bout en bout par le client, le serveur d'autorisation et la gateway ou API. Tester le refus d'un jeton lié à une clé présenté sans preuve ou avec une autre clé. Ne pas supposer que le support OAuth implique celui de DPoP.\n\nTrois termes : bearer token (jeton au porteur), sender-constrained token (jeton lié à son présentateur), proof of possession (preuve de possession de clé).",
+      "takeaways": [
+        "Un jeton au porteur valide peut être réutilisé après une fuite.",
+        "DPoP lie le jeton à une clé et exige une preuve signée par requête.",
+        "La protection dépend de la clé et de la validation de bout en bout."
+      ],
+      "sources": [
+        {
+          "title": "IETF — RFC 9449 : OAuth 2.0 Demonstrating Proof of Possession",
+          "url": "https://www.rfc-editor.org/rfc/rfc9449"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Que manque-t-il à un attaquant qui ne possède que le jeton DPoP ?",
+          "options": [
+            "La clé privée associée",
+            "Le nom de l'IdP",
+            "Le format JSON"
+          ],
+          "answer": 0,
+          "explanation": "La clé privée permet de produire une nouvelle preuve valide."
+        },
+        {
+          "question": "Qui doit vérifier la preuve lors d'un appel API ?",
+          "options": [
+            "Le système RH",
+            "Le serveur de ressources",
+            "Le navigateur uniquement"
+          ],
+          "answer": 1,
+          "explanation": "La ressource doit contrôler la preuve et son association au jeton."
+        },
+        {
+          "question": "DPoP remplace-t-il HTTPS ?",
+          "options": [
+            "Oui",
+            "Seulement pour les JWT",
+            "Non"
+          ],
+          "answer": 2,
+          "explanation": "HTTPS reste obligatoire pour protéger les échanges."
         }
       ]
     }
