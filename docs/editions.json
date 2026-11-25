@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-24T08:11:33Z",
+  "updatedAt": "2026-11-25T09:00:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -1926,6 +1926,80 @@
           ],
           "answer": 2,
           "explanation": "La propagation de révocation dépend de l'implémentation."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-25",
+      "category": "fintech",
+      "date": "2026-11-25",
+      "number": 15,
+      "title": "Paiement agentique : réconcilier la commande, pas croire l’agent",
+      "summary": "Un rapprochement fiable relie checkout, paiement, webhooks et émission des billets par des identifiants stables.",
+      "tag": "Réconciliation · Webhooks · Audit",
+      "minutes": 4,
+      "content": "## Veille protocoles — statut au 25 novembre\n\n- **ACP / ChatGPT : beta privée.** Le checkout intégré est encore limité à certains marketplaces. La documentation demande au serveur de persister une commande, vérifier le token, être idempotent et retourner un reçu autoritaire.\n- **Stripe : production.** Pour Checkout, Stripe recommande de déclencher la confirmation et le fulfillment depuis les événements serveur plutôt que depuis le retour navigateur ; les paiements asynchrones ont leurs événements propres.\n- **AP2 : spécification v0.2.** Les Payment Receipts portent un statut, la référence du mandat fermé et, en succès, des identifiants PSP et réseau ; ils servent de preuves liées au mandat.\n- **UCP : spécification/draft.** La spécification Order recommande les webhooks comme canal principal, GET Order pour la réconciliation, et des événements signés avec identifiant stable lors des retries.\n\n## Le concept : réconcilier, c’est rapprocher des preuves, pas comparer des écrans\n\nPour une réservation de groupe, trois choses peuvent diverger : l’agent dit « payé », Stripe a autorisé ou confirmé un paiement, et le marchand a — ou non — émis les billets. La **réconciliation** consiste à lier ces faits avec des références stables pour produire un statut métier fiable.\n\nCrée une table ou un journal de corrélation côté marchand. Pour chaque commande, conserve au minimum : `order_id`, `checkout_id`, `payment_intent_id` ou référence PSP, `provider_event_id`, `merchant_receipt_id`, montant, devise, statut et horodatages. N’utilise jamais le message conversationnel de l’assistant comme preuve de paiement.\n\nLe webhook Stripe ou PSP est le déclencheur asynchrone. Vérifie d’abord sa signature, déduplique son identifiant, puis traite l’événement dans une transaction idempotente. Après une panne ou un doute, lis l’état courant de la ressource PSP et de la commande marchand : un événement reçu hors ordre ne doit pas faire régresser une commande de `ticket_issued` à `payment_processing`.\n\nAP2 apporte un modèle supplémentaire de preuve : receipt de checkout et receipt de paiement, chacun référencé au mandat fermé. Mais AP2 ne remplace pas tes rapprochements PSP ni le système de réservation : il reste une spécification de sécurité et de preuve.\n\n## Cinématique\n\n`Assistant → Marchand` : l’agent demande le checkout ; le marchand fige un checkout_id et calcule le prix.  \n`Utilisateur → wallet / banque` : il approuve ; le wallet/PSP fournit un token, sans révéler la carte à l’agent.  \n`Marchand → PSP → réseau/banque` : le marchand initie le paiement et attend l’événement signé.  \n`PSP → Marchand → Assistant` : le webhook met à jour la commande ; le marchand émet les billets puis retourne le reçu métier. L’assistant affiche ce statut, il ne l’invente pas.\n\nMCP n’est donc pas le bus de règlement : il expose les outils. Le marchand reste source de vérité du panier, du prix, de la commande et de la réconciliation ; OpenAI n’est pas Merchant of Record.\n\n## Geste POC prioritaire\n\nImplémente une fonction unique `apply_payment_event(event)` :\n\n    1. vérifier signature et type d’événement\n    2. insérer provider_event_id avec une contrainte d’unicité\n    3. charger order_id via la référence PSP\n    4. appliquer une transition d’état autorisée\n    5. écrire un événement d’audit et répondre 2xx\n\nScénario de test : livre deux fois le même webhook `payment_succeeded`, puis un événement plus ancien `payment_processing`. Attendu : une seule émission de billets ; le doublon est ignoré et l’état final reste `ticket_issued`.",
+      "takeaways": [
+        "La conversation de l’agent n’est pas une preuve de paiement : les états marchand et PSP font foi.",
+        "Un journal de corrélation permet d’expliquer chaque commande, paiement, webhook et émission.",
+        "Signature, déduplication et transitions d’état empêchent les doubles émissions et les retours en arrière."
+      ],
+      "sources": [
+        {
+          "title": "OpenAI Developers — Add UI to your MCP server",
+          "url": "https://developers.openai.com/plugins/build/chatgpt-ui"
+        },
+        {
+          "title": "Stripe Documentation — Payments for existing customers",
+          "url": "https://docs.stripe.com/payments/existing-customers?platform=web&ui=stripe-hosted"
+        },
+        {
+          "title": "AP2 — Payment Mandate",
+          "url": "https://ap2-protocol.org/ap2/payment_mandate/"
+        },
+        {
+          "title": "AP2 — Agentic Payment Protocol v0.2",
+          "url": "https://ap2-protocol.org/ap2/specification/"
+        },
+        {
+          "title": "UCP — Order specification (draft)",
+          "url": "https://ucp.dev/draft/specification/shopping/order/"
+        },
+        {
+          "title": "UCP — Message signatures",
+          "url": "https://ucp.dev/specification/signatures/"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Quelle source doit faire foi pour confirmer une commande de billets ?",
+          "options": [
+            "Le message « achat réussi » de l’agent",
+            "Le statut marchand mis à jour par un événement PSP vérifié",
+            "Le retour HTTP initial de création de panier"
+          ],
+          "answer": 1,
+          "explanation": "La confirmation opérationnelle vient du système marchand après traitement fiable des événements de paiement et d’émission."
+        },
+        {
+          "question": "Pourquoi conserver provider_event_id avec une contrainte unique ?",
+          "options": [
+            "Pour ignorer les doublons de webhook",
+            "Pour afficher le numéro de carte",
+            "Pour calculer la TVA"
+          ],
+          "answer": 0,
+          "explanation": "Les PSP peuvent réessayer un événement ; le même événement ne doit jamais émettre une seconde fois les billets."
+        },
+        {
+          "question": "Après un incident, quel réflexe aide à résoudre une ambiguïté ?",
+          "options": [
+            "Rejouer aveuglément la capture",
+            "Lire l’état courant PSP et marchand puis réconcilier",
+            "Demander à l’agent de choisir le statut"
+          ],
+          "answer": 1,
+          "explanation": "Le rapprochement sur les références et états autoritaires évite de décider depuis un affichage ou un événement hors ordre."
         }
       ]
     }
