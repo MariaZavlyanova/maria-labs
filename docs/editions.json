@@ -1,7 +1,7 @@
 {
   "format": "lebrief-feed-v1",
   "site": "lebrief",
-  "updatedAt": "2026-11-25T08:55:22Z",
+  "updatedAt": "2026-11-26T09:00:00+01:00",
   "editions": [
     {
       "id": "cyber-2026-10-30",
@@ -2054,6 +2054,84 @@
           ],
           "answer": 2,
           "explanation": "HTTPS reste obligatoire pour protéger les échanges."
+        }
+      ]
+    },
+    {
+      "id": "fintech-2026-11-26",
+      "category": "fintech",
+      "date": "2026-11-26",
+      "number": 16,
+      "title": "Paiement agentique : être identifié ne donne pas le droit de payer",
+      "summary": "Séparer l’authentification de l’agent, l’identité client et l’autorisation bornée de paiement évite les achats inter-comptes.",
+      "tag": "Identité · Autorisation · MCP",
+      "minutes": 4,
+      "content": "## Veille protocoles — statut au 26 novembre\n\n- **ACP / OpenAI : fonctionnalités sélectives.** Pour un MCP commerce, OpenAI indique que le serveur doit autoriser chaque requête ; l’identité de compte authentifiée est disponible via des credentials, et un outil de profil peut fournir un identifiant opaque stable. Sign in with ChatGPT est réservé à des partenaires commerciaux sélectionnés : l’identité ChatGPT ne vaut pas approbation d’achat.\n- **AP2 : spécification v0.2.** Le modèle sépare délégation de mandat et autorisation de l’action. Dans un flux autonome, un mandat ouvert doit lier la clé publique de l’agent et avoir une expiration la plus courte possible.\n- **UCP : spécification/draft.** UCP documente plusieurs mécanismes d’authentification transport (OAuth, mTLS, signatures HTTP) et une capacité OAuth de liaison d’identité entre plateforme et marchand.\n- **Visa : pilote en production limitée.** Visa, BILL et Billtrust ont annoncé le 20 octobre 2026 un pilote B2B actif combinant agent authentifié, credentials tokenisés et contrôles attachés à l’instruction approuvée.\n\n## Le concept : identité, authentification et autorisation sont trois choses différentes\n\nDans ton POC, l’agent MCP peut être **authentifié** auprès de l’API marchand : par exemple avec mTLS ou OAuth. Cela répond à « quel système appelle mon API ? ». Une connexion utilisateur au marchand répond à « quel compte client est concerné ? ».\n\nMais ni l’une ni l’autre ne répond à « cet agent peut-il payer ces billets maintenant ? ». C’est l’**autorisation** de paiement : elle doit être portée par une délégation ou un mandat précis, lié à un checkout serveur, avec montant, devise, marchand, expiration et éventuellement clé d’agent.\n\nNe prends donc jamais `customer_id` ou `traveller_id` depuis les arguments d’un outil MCP pour décider de l’identité. Résous le client à partir de la session OAuth ou du contexte serveur authentifié ; vérifie qu’il possède le panier et qu’il peut le modifier. Utilise des références opaques dans les outils, pas des identifiants internes exploitables par le modèle.\n\nPour un groupe, distingue bien trois identités : le **titulaire du compte marchand**, l’**organisateur habilité** à modifier les voyageurs, et l’**agent** qui exécute un appel technique. Une autorisation de payer ne doit pas se propager automatiquement de l’un aux autres.\n\n## Cinématique\n\n`Assistant → Marchand` : appel MCP authentifié ; le serveur identifie la plateforme et résout le client depuis la session, jamais depuis un customer_id fourni.  \n`Marchand` : vérifie propriété du panier, rôle organisateur et prix courant ; il crée un checkout_id.  \n`Utilisateur → wallet / banque` : il approuve la transaction ou le mandat borné.  \n`Marchand → PSP/wallet → réseau/banque → Marchand` : le marchand vérifie token et contraintes ; l’agent ne reçoit jamais les données carte. Le webhook signé confirme ensuite le résultat.\n\nMCP expose le moyen d’appeler l’API, mais ne confère aucun droit métier. OpenAI n’est pas Merchant of Record ; le marchand demeure source de vérité du panier, de l’identité liée à la commande et du prix.\n\n## Geste POC prioritaire\n\nCrée un middleware `resolve_principal()` qui produit :\n\n    principal.platform_id\n    principal.merchant_customer_id\n    principal.organizer_roles\n    principal.authenticated_at\n\nPuis fais refuser toute requête `get_order`, `update_cart` ou `pay` où la ressource n’appartient pas à `merchant_customer_id`. Test de sécurité : l’agent appelle `get_order(order_B)` avec une session liée au client A. Attendu : `404` ou `403`, aucun détail sur B, et un audit `cross_account_access_denied`.",
+      "takeaways": [
+        "Une connexion agent ou client identifie un principal ; elle ne constitue pas un consentement de paiement.",
+        "Les droits sur panier, voyageurs et ordre doivent être résolus côté serveur depuis le contexte authentifié.",
+        "Un mandat de paiement lie explicitement une action, un checkout et des contraintes : il ne découle pas du seul login."
+      ],
+      "sources": [
+        {
+          "title": "OpenAI Developers — Build a plugin",
+          "url": "https://developers.openai.com/commerce/guides/build-a-plugin"
+        },
+        {
+          "title": "OpenAI Developers — Authentication for plugins",
+          "url": "https://developers.openai.com/plugins/build/auth?site_locale=en"
+        },
+        {
+          "title": "OpenAI Developers — Sign in with ChatGPT",
+          "url": "https://developers.openai.com/commerce/guides/integrate-sign-in-with-chatgpt"
+        },
+        {
+          "title": "AP2 — Agent Authorization Framework",
+          "url": "https://ap2-protocol.org/ap2/agent_authorization/"
+        },
+        {
+          "title": "AP2 — Agentic Payment Protocol v0.2",
+          "url": "https://ap2-protocol.org/ap2/specification/"
+        },
+        {
+          "title": "UCP — Checkout REST",
+          "url": "https://ucp.dev/draft/specification/shopping/checkout/rest/"
+        },
+        {
+          "title": "Visa — BILL and Billtrust agentic payments pilot",
+          "url": "https://corporate.visa.com/en/sites/visa-perspectives/newsroom/visa-bill-billtrust-launch-pilot.html"
+        }
+      ],
+      "quiz": [
+        {
+          "question": "Un appel MCP authentifié prouve-t-il à lui seul que l’agent peut payer ?",
+          "options": [
+            "Oui, l’authentification suffit",
+            "Non, il faut aussi une autorisation ou un mandat conforme",
+            "Oui, si le panier existe"
+          ],
+          "answer": 1,
+          "explanation": "L’authentification identifie l’appelant ; l’autorisation vérifie le droit précis d’effectuer le paiement."
+        },
+        {
+          "question": "D’où le marchand doit-il résoudre le client propriétaire d’une commande ?",
+          "options": [
+            "D’un customer_id donné dans l’argument de l’outil",
+            "Du contexte de session ou des credentials authentifiés",
+            "Du texte envoyé par l’agent"
+          ],
+          "answer": 1,
+          "explanation": "Le serveur doit lier la requête à une identité fiable et ne pas accepter une identité choisie par le caller."
+        },
+        {
+          "question": "Quel attribut lie un mandat ouvert AP2 à l’agent autorisé ?",
+          "options": [
+            "La clé publique de l’agent dans la revendication cnf",
+            "Le nom du modèle",
+            "L’adresse IP du marchand"
+          ],
+          "answer": 0,
+          "explanation": "Dans le flux autonome, AP2 demande d’inclure la clé publique de l’agent pour borner l’usage du mandat."
         }
       ]
     }
